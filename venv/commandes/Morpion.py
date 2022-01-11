@@ -1,23 +1,19 @@
 import discord
 from discord.ext.commands import Cog, command
-from discord.commands import slash_command, message_command, user_command
 from discord.ext import commands
-from discord.ui import Button, View, view
-from discord import Embed, File, interactions
 
-from typing import List, Optional
-import random
+from typing import List
+
 
 class Morpion(Cog):
-	def __init__(self, bot):
-		self.bot = bot
-
+    def __init__(self, bot):
+        self.bot = bot
 
     # TODO : ajouter un membre dans les paramètres
-	@command(name='morpion')
-	async def morpion(self, ctx: commands.Context):
-		"""Starts a tic-tac-toe game with yourself."""
-		await ctx.send(f"{ctx.author.name} invite c  à jouer :", view=TicTacToe())
+    @command(name='morpion')
+    async def morpion(self, ctx: commands.Context):
+        """Starts a tic-tac-toe game with yourself."""
+        await ctx.send(f"{ctx.author.name} invite c  à jouer :", view=TicTacToe())
 
 
 # Defines a custom button that contains the logic of the game.
@@ -60,7 +56,7 @@ class TicTacToeButton(discord.ui.Button["TicTacToe"]):
 
         winner = view.check_board_winner()
         if winner is not None:
-            if winner == view.X or winner == view.O :
+            if winner == view.X or winner == view.O:
                 content = f"{interaction.user.name} a gagné!"
             else:
                 content = "Égalité !"
@@ -133,6 +129,7 @@ class TicTacToe(discord.ui.View):
             return self.Tie
 
         return None
+
 
 def setup(bot):
     bot.add_cog(Morpion(bot))

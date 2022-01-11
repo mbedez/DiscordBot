@@ -1,7 +1,4 @@
-import discord
 from discord.ext.commands import Cog
-from discord.ext import commands
-from discord.ext.commands import command
 
 
 class Sondage(Cog):
@@ -9,7 +6,5 @@ class Sondage(Cog):
 		self.bot = bot
 
 
-
 def setup(bot):
-    bot.add_cog(Sondage(bot))
-
+	bot.add_cog(Sondage(bot))

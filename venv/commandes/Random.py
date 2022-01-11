@@ -1,10 +1,6 @@
-import discord
 from discord.ext.commands import Cog
-from discord.ext import commands
 from random import randint
 from discord.ext.commands import command
-
-
 
 
 class Random(Cog):
@@ -14,7 +10,7 @@ class Random(Cog):
 	@command(name='random')
 	async def random(self, ctx, value: int):
 		result = randint(1, value)
-		if value<7 :
+		if value < 7:
 			if result == 1:
 				await ctx.channel.send(f"1️⃣")
 			if result == 2:
@@ -27,10 +23,10 @@ class Random(Cog):
 				await ctx.channel.send(f"5️⃣")
 			if result == 6:
 				await ctx.channel.send(f"6️⃣")
-		if not value<7 :
+		if not value < 7:
 			print(f"{result}")
 			await ctx.channel.send(f"{result}")
 
-def setup(bot):
-    bot.add_cog(Random(bot))
 
+def setup(bot):
+	bot.add_cog(Random(bot))

@@ -6,10 +6,7 @@ from commandes import Help
 from commandes import Sondage
 from abc import ABC
 
-import discord
-# from discord.ext.commands import command
 from discord.ext.commands import Bot
-from discord.ui import Button, View
 from discord import Intents
 
 from dotenv import load_dotenv
@@ -28,7 +25,9 @@ class DocBot(Bot, ABC):
             print(f"Loading cog : {cog}")
 
     async def on_ready(self):
+        print(" ")
         print(f"{self.user.display_name} est connecté au serveur.")
+        print(" ")
 
 
 bot = DocBot()
@@ -37,7 +36,6 @@ bot = DocBot()
 @bot.command(name='ping')
 async def ping(message):
     await message.channel.send("pong")
-
 
 
 bot.run(os.getenv("TOKEN"))

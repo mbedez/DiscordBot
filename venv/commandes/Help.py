@@ -8,9 +8,9 @@ class Help(Cog):
 
     @command(name='help')
     async def helping(self, ctx):
-        await ctx.channel.send("&ping : renvoie pong\n&delete x : supprime x messages\n"
-                               "&random x : génère un nombre entre 1 et x\n&haitrixx : s'excuse pour le spam\n"
-                               "&morpion : essaye de jouer au morpion, en vain")
+        await ctx.channel.send("&delete n : supprime n messages\n&random x : génère un nombre entre 1 et x\n"
+                               "&morpion : essaye de jouer au morpion, en vain\n"
+                               " TODO : &poll a b : lance un sondage entre a et b")
 
 
 def setup(bot):

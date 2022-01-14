@@ -19,7 +19,9 @@ class Sondage(Cog):
         await ctx.send(f"{question}", view=view)
 
         async def button_callback(interaction):
+            await interaction.response.send_message("test")
             await interaction.response.edit_message()
+            await interaction.response.send_message("test")
 
         button1.callback = button_callback
         button2.callback = button_callback

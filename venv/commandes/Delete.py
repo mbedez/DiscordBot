@@ -15,10 +15,14 @@ class Delete(Cog):
         probot_id = 282859044593598464
         tom_id = 181092186228654082
 
-        if message.author.id == tom_id or (message.channel.guild.id == serv_nst_id and
+        bool_tom = True
+        bool_fc = False
+        bool_nst = False
+
+        if (message.author.id == tom_id  and bool_tom) or (message.channel.guild.id == serv_nst_id and
                                            message.channel.id != channel_hydra_id and
-                                           message.author.id != probot_id and 1 == 2) or \
-                (message.channel.guild.id == serv_fc_id and 1 == 2):
+                                           message.author.id != probot_id and bool_nst) or \
+                (message.channel.guild.id == serv_fc_id and bool_fc):
             messages = await message.channel.history(limit=1).flatten()
             f = open('sortie.txt', 'a')
             f.write(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n{str(message.author)}\n"

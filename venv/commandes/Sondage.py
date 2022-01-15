@@ -1,8 +1,8 @@
 import discord
+from datetime import datetime
 from discord.ext.commands import Cog, command
 from discord.ext import commands
 from discord.ui import Button, View
-
 
 class Sondage(Cog):
     def __init__(self, bot):
@@ -10,21 +10,42 @@ class Sondage(Cog):
 
     @command(name='poll')
     async def sondage(self, ctx: commands.Context, question, proposition1, proposition2):
+        call = await ctx.message.channel.history(limit=1).flatten()
+        await call[0].delete()
+
         button1 = Button(label=f"{proposition1}", style=discord.ButtonStyle.success)
         button2 = Button(label=f"{proposition2}", style=discord.ButtonStyle.danger)
 
-        view = View()
+        view = View(timeout=None)
         view.add_item(button1)
         view.add_item(button2)
         await ctx.send(f"{question}", view=view)
+        poll_message = await ctx.message.channel.history(limit=1).flatten()
+        poll_id = poll_message[0].id
+        poll_contenu = poll_message[0].content
 
-        async def button_callback(interaction):
-            await interaction.response.send_message("test")
-            await interaction.response.edit_message()
-            await interaction.response.send_message("test")
+        async def button_callback1(interaction):
+            utilisateur = str(interaction.user)[:-5]
+            await ctx.channel.send(f"✅ {utilisateur}")
+            histo = await ctx.message.channel.history(limit=50).flatten()
+            i = 0
+            while histo[i].id != poll_id :
+                if histo[0].content[-2:] == histo[i+1].content[-2:]:
+                    await histo[0].delete()
+                i += 1
 
-        button1.callback = button_callback
-        button2.callback = button_callback
+        async def button_callback2(interaction):
+            utilisateur = str(interaction.user)[:-5]
+            await ctx.channel.send(f"❌ {utilisateur}")
+            histo = await ctx.message.channel.history(limit=50).flatten()
+            i = 0
+            while histo[i].id != poll_id :
+                if histo[0].content[-2:] == histo[i+1].content[-2:]:
+                    await histo[0].delete()
+                i += 1
+
+        button1.callback = button_callback1
+        button2.callback = button_callback2
 
 
 def setup(bot):

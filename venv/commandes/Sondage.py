@@ -26,23 +26,29 @@ class Sondage(Cog):
 
         async def button_callback1(interaction):
             utilisateur = str(interaction.user)[:-5]
-            await ctx.channel.send(f"✅ {utilisateur}")
+            post = f"✅ {utilisateur}"
             histo = await ctx.message.channel.history(limit=50).flatten()
+            first_reaction = True
             i = 0
             while histo[i].id != poll_id :
-                if histo[0].content[-2:] == histo[i+1].content[-2:]:
-                    await histo[0].delete()
+                if post[-2:] == histo[i].content[-2:]:
+                    first_reaction = False
                 i += 1
+            if first_reaction == True :
+                await ctx.channel.send(post)
 
         async def button_callback2(interaction):
             utilisateur = str(interaction.user)[:-5]
-            await ctx.channel.send(f"❌ {utilisateur}")
+            post = f"❌ {utilisateur}"
             histo = await ctx.message.channel.history(limit=50).flatten()
+            first_reaction = True
             i = 0
             while histo[i].id != poll_id :
-                if histo[0].content[-2:] == histo[i+1].content[-2:]:
-                    await histo[0].delete()
+                if post[-2:] == histo[i].content[-2:]:
+                    first_reaction = False
                 i += 1
+            if first_reaction == True :
+                await ctx.channel.send(post)
 
         button1.callback = button_callback1
         button2.callback = button_callback2

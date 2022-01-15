@@ -22,11 +22,10 @@ class Sondage(Cog):
         await ctx.send(f"{question}", view=view)
         poll_message = await ctx.message.channel.history(limit=1).flatten()
         poll_id = poll_message[0].id
-        poll_contenu = poll_message[0].content
 
         async def button_callback1(interaction):
-            utilisateur = str(interaction.user)[:-5]
-            post = f"✅ {utilisateur}"
+            utilisateur = str(interaction.user)
+            post = f"🟩 {utilisateur}"
             histo = await ctx.message.channel.history(limit=50).flatten()
             first_reaction = True
             i = 0
@@ -38,8 +37,8 @@ class Sondage(Cog):
                 await ctx.channel.send(post)
 
         async def button_callback2(interaction):
-            utilisateur = str(interaction.user)[:-5]
-            post = f"❌ {utilisateur}"
+            utilisateur = str(interaction.user)
+            post = f"🟥 {utilisateur}"
             histo = await ctx.message.channel.history(limit=50).flatten()
             first_reaction = True
             i = 0

@@ -1,6 +1,6 @@
 # FafBot
 ***
-[Intro](#What\ is\ FafBot?) - [Commands](#What\ can\ you\ do\ with\ it?) - [Setup](#What\ do\ you\ need\ in\ order\ to\ set\ FafBot\ up?) - [The future of FafBot](#What\ is\ the\ future\ of\ FafBot)
+[Intro](#What-is-FafBot?) - [Commands](#What-can-you-do-with-it?) - [Setup](#What-do-you-need-in-order-to-set-FafBot-up?) - [The future of FafBot](#What-is-the-future-of-FafBot)
 ***
 ## What is FafBot?
 FafBot is a small project I made to learn the *discord.py* python package.

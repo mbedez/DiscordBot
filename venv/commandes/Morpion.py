@@ -45,14 +45,14 @@ class TicTacToeButton(discord.ui.Button["TicTacToe"]):
             self.disabled = True
             view.board[self.y][self.x] = view.X
             view.current_player = view.O
-            content = f"Au tour du deuxième joueur :"
+            content = f"Au tour du joueur 2 :"
         else:
             self.style = discord.ButtonStyle.success
             self.label = "O"
             self.disabled = True
             view.board[self.y][self.x] = view.O
             view.current_player = view.X
-            content = f"Au tour du premier joueur :"
+            content = f"Au tour du joueur 1 :"
 
         winner = view.check_board_winner()
         if winner is not None:

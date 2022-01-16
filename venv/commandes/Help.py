@@ -8,9 +8,10 @@ class Help(Cog):
 
     @command(name='help')
     async def helping(self, ctx):
-        await ctx.channel.send("&delete n : supprime n messages\n&random x : génère un nombre entre 1 et x\n"
-                               "&morpion : essaye de jouer au morpion, en vain\n"
-                               " TODO : &poll a b : lance un sondage entre a et b")
+        await ctx.channel.send("&delete n : supprime n messages\n"
+                               "&random n : génère un nombre entre 1 et n\n"
+                               "&morpion : essaye de jouer au morpion\n"
+                               "&poll a b c : écrit a et lance un sondage entre b et c\n")
 
 
 def setup(bot):

@@ -24,4 +24,4 @@ FafBot runs in python with the help of the **pycord** package. In order to run t
 ## What is the future of FafBot
 I would like to add a feature : `&worst_kda "user" int` which would connect to the league of legends API and give back the **worst kda** from the *int* last games **on a given user**.
 
-I also would like to improve the **morpion**, **delete** and **help** functions
+I also would like to improve the **delete** and **help** functions

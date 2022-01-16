@@ -11,7 +11,8 @@ class Help(Cog):
         await ctx.channel.send("&delete n : supprime n messages\n"
                                "&random n : génère un nombre entre 1 et n\n"
                                "&morpion @member : lance une partie de morpion avec @member\n"
-                               "&poll a b c : écrit a et lance un sondage entre b et c\n")
+                               "&poll 'question' 'first_option' 'second_option' : "
+                               "lance un sondage auquel tout le monde peut répondre\n")
 
 
 def setup(bot):

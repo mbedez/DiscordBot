@@ -10,7 +10,7 @@ class Help(Cog):
     async def helping(self, ctx):
         await ctx.channel.send("&delete n : supprime n messages\n"
                                "&random n : génère un nombre entre 1 et n\n"
-                               "&morpion : essaye de jouer au morpion\n"
+                               "&morpion @member : lance une partie de morpion avec @member\n"
                                "&poll a b c : écrit a et lance un sondage entre b et c\n")
 
 

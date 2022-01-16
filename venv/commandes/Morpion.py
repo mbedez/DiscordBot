@@ -2,7 +2,6 @@ import discord
 from discord.ext.commands import Cog, command
 from discord.ext import commands
 from discord import Member
-
 from typing import List
 
 
@@ -82,7 +81,7 @@ class TicTacToe(discord.ui.View):
     Tie = 2
 
     def __init__(self):
-        super().__init__()
+        super().__init__(timeout=None)
         self.current_player = self.X
         self.board = [
             [0, 0, 0],

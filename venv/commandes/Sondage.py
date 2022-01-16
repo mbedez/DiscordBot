@@ -1,8 +1,8 @@
 import discord
-from datetime import datetime
 from discord.ext.commands import Cog, command
 from discord.ext import commands
 from discord.ui import Button, View
+
 
 class Sondage(Cog):
     def __init__(self, bot):
@@ -29,11 +29,15 @@ class Sondage(Cog):
             histo = await ctx.message.channel.history(limit=50).flatten()
             first_reaction = True
             i = 0
-            while histo[i].id != poll_id :
+            while histo[i].id != poll_id:
                 if post[-2:] == histo[i].content[-2:]:
-                    first_reaction = False
+                    if post == histo[i].content:
+                        await histo[i].delete()
+                        first_reaction = False
+                    else:
+                        await histo[i].delete()
                 i += 1
-            if first_reaction == True :
+            if first_reaction:
                 await ctx.channel.send(post)
 
         async def button_callback2(interaction):
@@ -42,11 +46,15 @@ class Sondage(Cog):
             histo = await ctx.message.channel.history(limit=50).flatten()
             first_reaction = True
             i = 0
-            while histo[i].id != poll_id :
+            while histo[i].id != poll_id:
                 if post[-2:] == histo[i].content[-2:]:
-                    first_reaction = False
+                    if post == histo[i].content:
+                        await histo[i].delete()
+                        first_reaction = False
+                    else:
+                        await histo[i].delete()
                 i += 1
-            if first_reaction == True :
+            if first_reaction:
                 await ctx.channel.send(post)
 
         button1.callback = button_callback1

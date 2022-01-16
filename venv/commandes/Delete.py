@@ -18,9 +18,9 @@ class Delete(Cog):
         bool_fc = False
         bool_nst = False
 
-        if (message.author.id == tom_id  and bool_tom) or (message.channel.guild.id == serv_nst_id and
-                                           message.channel.id != channel_hydra_id and
-                                           message.author.id != probot_id and bool_nst) or \
+        if (message.author.id == tom_id and bool_tom) or (message.channel.guild.id == serv_nst_id and
+                                                          message.channel.id != channel_hydra_id and
+                                                          message.author.id != probot_id and bool_nst) or \
                 (message.channel.guild.id == serv_fc_id and bool_fc):
             messages = await message.channel.history(limit=1).flatten()
             f = open('sortie.txt', 'a')
@@ -30,7 +30,7 @@ class Delete(Cog):
             await messages[0].delete()
             print(f"Message écrit par {str(message.author)} à {datetime.now().strftime('%H:%M:%S')} sur "
                   f"{str(message.channel)} : {str(message.content)}\n\n")
-            
+
     @command(name='delete')
     async def delete(self, ctx, number_of_messages: int):
         messages = await ctx.channel.history(limit=number_of_messages + 1).flatten()

@@ -13,15 +13,16 @@ Here's a list of different things you could do with this bot:
 - **&morpion** => A basic **tic-tac-toe** game you can play in chat.
 - **&poll** *"question"* *first_option* *second_option* => Makes a poll that everyone can respond to.
 - **&delete** *int* => Delete the last *int* messages.
+- **&lolaccount** *summoner_name* => give you the level of the summoner.
 ***
 ## What do you need in order to set FafBot up?
 FafBot runs in python with the help of the **pycord** package. In order to run the bot, you will need a few things :
 - python3 (*of course*)
 - pycord : `pip install py-cord`
 - dotenv : `pip install python-dotenv`
-- a *config* file containing your **discord Token**
+- a *config* file containing your **discord Token** and your **Riot API Key**
 ***
 ## What is the future of FafBot
-I would like to add a feature : `&worst_kda "user" int` which would connect to the league of legends API and give back the **worst kda** from the *int* last games **on a given user**.
+I would like to add a feature : `&lolaccount` which would connect to the league of legends API and give back the **level** and **rank** of the given summoner name.
 
-I also would like to improve the **delete** and **help** functions
+I also would like to improve the **delete** function

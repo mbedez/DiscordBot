@@ -40,13 +40,13 @@ class Sondage(Cog):
                         Sondage.nb_vote_green -= 1
                         if (Sondage.nb_vote_green + Sondage.nb_vote_red) != 0:
                             await interaction.response.edit_message(
-                                content=f"{question}                🟩 {Sondage.nb_vote_green} -  🟥 "
-                                        f"{Sondage.nb_vote_red}         soit "
-                                        f"{int((Sondage.nb_vote_green / (Sondage.nb_vote_green + Sondage.nb_vote_red)) * 100)}%")
+                                content=f"{question}                🟩 {Sondage.nb_vote_green}  -  "
+                                        f"{Sondage.nb_vote_red} 🟥         soit "
+                                        f"{int((Sondage.nb_vote_green / (Sondage.nb_vote_green + Sondage.nb_vote_red)) * 100)}% 🟩")
                         else:
                             await interaction.response.edit_message(
-                                content=f"{question}                🟩 {Sondage.nb_vote_green} -  🟥 "
-                                        f"{Sondage.nb_vote_red}")
+                                content=f"{question}                🟩 {Sondage.nb_vote_green}  -  "
+                                        f"{Sondage.nb_vote_red} 🟥")
                     else:
                         await histo[i].delete()
                         Sondage.nb_vote_red -= 1
@@ -54,9 +54,9 @@ class Sondage(Cog):
             if first_reaction:
                 await ctx.channel.send(post)
                 Sondage.nb_vote_green += 1
-                await interaction.response.edit_message(content=f"{question}                🟩 {Sondage.nb_vote_green} -  🟥 "
-                                                        f"{Sondage.nb_vote_red}         soit "
-                                                        f"{int((Sondage.nb_vote_green / (Sondage.nb_vote_green + Sondage.nb_vote_red)) * 100)}%")
+                await interaction.response.edit_message(content=f"{question}                🟩 {Sondage.nb_vote_green}  -  "
+                                                        f"{Sondage.nb_vote_red} 🟥         soit "
+                                                        f"{int((Sondage.nb_vote_green / (Sondage.nb_vote_green + Sondage.nb_vote_red)) * 100)}% 🟩")
 
         async def button_callback2(interaction):
             utilisateur = str(interaction.user)
@@ -72,13 +72,13 @@ class Sondage(Cog):
                         Sondage.nb_vote_red -= 1
                         if (Sondage.nb_vote_green + Sondage.nb_vote_red) != 0:
                             await interaction.response.edit_message(
-                                content=f"{question}                🟩 {Sondage.nb_vote_green} -  🟥 "
-                                        f"{Sondage.nb_vote_red}         soit "
-                                        f"{int((Sondage.nb_vote_green / (Sondage.nb_vote_green + Sondage.nb_vote_red)) * 100)}%")
+                                content=f"{question}                🟩 {Sondage.nb_vote_green}  -  "
+                                        f"{Sondage.nb_vote_red} 🟥         soit "
+                                        f"{int((Sondage.nb_vote_green / (Sondage.nb_vote_green + Sondage.nb_vote_red)) * 100)}% 🟩")
                         else:
                             await interaction.response.edit_message(
-                                content=f"{question}                🟩 {Sondage.nb_vote_green} -  🟥 "
-                                        f"{Sondage.nb_vote_red}")
+                                content=f"{question}                🟩 {Sondage.nb_vote_green}  -  "
+                                        f"{Sondage.nb_vote_red} 🟥")
                     else:
                         await histo[i].delete()
                         Sondage.nb_vote_green -= 1
@@ -86,9 +86,9 @@ class Sondage(Cog):
             if first_reaction:
                 await ctx.channel.send(post)
                 Sondage.nb_vote_red += 1
-                await interaction.response.edit_message(content=f"{question}                🟩 {Sondage.nb_vote_green} -  🟥 "
-                                                        f"{Sondage.nb_vote_red}         soit "
-                                                        f"{int((Sondage.nb_vote_green / (Sondage.nb_vote_green + Sondage.nb_vote_red)) * 100)}%")
+                await interaction.response.edit_message(content=f"{question}                🟩 {Sondage.nb_vote_green}  -  "
+                                                        f"{Sondage.nb_vote_red} 🟥         soit "
+                                                        f"{int((Sondage.nb_vote_green / (Sondage.nb_vote_green + Sondage.nb_vote_red)) * 100)}% 🟩")
 
         button1.callback = button_callback1
         button2.callback = button_callback2

@@ -7,6 +7,8 @@ from discord.ui import Button, View
 class Sondage(Cog):
     def __init__(self, bot):
         self.bot = bot
+    nb_vote_green = 0
+    nb_vote_red = 0
 
     @command(name='poll')
     async def sondage(self, ctx: commands.Context, question, proposition1, proposition2):
@@ -24,6 +26,7 @@ class Sondage(Cog):
         poll_id = poll_message[0].id
 
         async def button_callback1(interaction):
+
             utilisateur = str(interaction.user)
             post = f"🟩 {utilisateur}"
             histo = await ctx.message.channel.history(limit=50).flatten()
@@ -34,11 +37,26 @@ class Sondage(Cog):
                     if post == histo[i].content:
                         await histo[i].delete()
                         first_reaction = False
+                        Sondage.nb_vote_green -= 1
+                        if (Sondage.nb_vote_green + Sondage.nb_vote_red) != 0:
+                            await interaction.response.edit_message(
+                                content=f"{question}                🟩 {Sondage.nb_vote_green} -  🟥 "
+                                        f"{Sondage.nb_vote_red}         soit "
+                                        f"{int((Sondage.nb_vote_green / (Sondage.nb_vote_green + Sondage.nb_vote_red)) * 100)}%")
+                        else:
+                            await interaction.response.edit_message(
+                                content=f"{question}                🟩 {Sondage.nb_vote_green} -  🟥 "
+                                        f"{Sondage.nb_vote_red}")
                     else:
                         await histo[i].delete()
+                        Sondage.nb_vote_red -= 1
                 i += 1
             if first_reaction:
                 await ctx.channel.send(post)
+                Sondage.nb_vote_green += 1
+                await interaction.response.edit_message(content=f"{question}                🟩 {Sondage.nb_vote_green} -  🟥 "
+                                                        f"{Sondage.nb_vote_red}         soit "
+                                                        f"{int((Sondage.nb_vote_green / (Sondage.nb_vote_green + Sondage.nb_vote_red)) * 100)}%")
 
         async def button_callback2(interaction):
             utilisateur = str(interaction.user)
@@ -51,11 +69,26 @@ class Sondage(Cog):
                     if post == histo[i].content:
                         await histo[i].delete()
                         first_reaction = False
+                        Sondage.nb_vote_red -= 1
+                        if (Sondage.nb_vote_green + Sondage.nb_vote_red) != 0:
+                            await interaction.response.edit_message(
+                                content=f"{question}                🟩 {Sondage.nb_vote_green} -  🟥 "
+                                        f"{Sondage.nb_vote_red}         soit "
+                                        f"{int((Sondage.nb_vote_green / (Sondage.nb_vote_green + Sondage.nb_vote_red)) * 100)}%")
+                        else:
+                            await interaction.response.edit_message(
+                                content=f"{question}                🟩 {Sondage.nb_vote_green} -  🟥 "
+                                        f"{Sondage.nb_vote_red}")
                     else:
                         await histo[i].delete()
+                        Sondage.nb_vote_green -= 1
                 i += 1
             if first_reaction:
                 await ctx.channel.send(post)
+                Sondage.nb_vote_red += 1
+                await interaction.response.edit_message(content=f"{question}                🟩 {Sondage.nb_vote_green} -  🟥 "
+                                                        f"{Sondage.nb_vote_red}         soit "
+                                                        f"{int((Sondage.nb_vote_green / (Sondage.nb_vote_green + Sondage.nb_vote_red)) * 100)}%")
 
         button1.callback = button_callback1
         button2.callback = button_callback2

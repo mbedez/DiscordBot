@@ -4,6 +4,7 @@ from commandes import Random
 from commandes import Delete
 from commandes import Help
 from commandes import Sondage
+from commandes import LolAccount
 from abc import ABC
 
 from discord.ext.commands import Bot
@@ -13,7 +14,7 @@ from dotenv import load_dotenv
 
 load_dotenv(dotenv_path="config")
 
-COGS = [Morpion, Random, Delete, Help, Sondage]
+COGS = [Morpion, Random, Delete, Help, Sondage, LolAccount]
 
 
 class DocBot(Bot, ABC):

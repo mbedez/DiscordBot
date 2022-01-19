@@ -24,7 +24,6 @@ class Random(Cog):
 			if result == 6:
 				await ctx.channel.send(f"6️⃣")
 		if not value < 7:
-			print(f"{result}")
 			await ctx.channel.send(f"{result}")
 
 

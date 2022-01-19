@@ -21,33 +21,63 @@ class LolAccount(Cog):
         response = requests.get(url)
         responsejson = response.json()
         lvl = str(responsejson["summonerLevel"])
-        print(lvl)
         id_lol = str(responsejson["id"])
 
         url = f"https://euw1.api.riotgames.com/lol/league/v4/entries/by-summoner/{id_lol}?api_key={RIOT_KEY}"
         url = str(url)
         response = requests.get(url)
         responsejson = response.json()
+        nb_of_ranks = len(responsejson)
+        no_ranked_sentence = None
+        soloq_sentence = None
+        flex_sentence = None
+        if nb_of_ranks == 0:
+            no_ranked_sentence = "Ce joueur n'est pas classé !"
+        else:
+            if (nb_of_ranks == 1 and (responsejson[0]["queueType"]=="RANKED_SOLO_5x5" or
+                                      responsejson[1]["queueType"]=="RANKED_SOLO_5x5")) or nb_of_ranks == 2:
+                i = -1
+                if responsejson[0]["queueType"]=="RANKED_SOLO_5x5":
+                    i=0
+                else:
+                    i=1
+                palier_lol = str(responsejson[i]["tier"])
+                division_lol = str(responsejson[i]["rank"])
+                league_point_lol = str(responsejson[i]["leaguePoints"])
+                wins_lol = responsejson[i]["wins"]
+                losses_lol = responsejson[i]["losses"]
+                winrate_sentence = None
+                if wins_lol + losses_lol != 0:
+                    winrate_lol = str((wins_lol / (wins_lol + losses_lol)) * 100)[0:5]
+                    winrate_sentence = f" Soit un winrate de {winrate_lol}%"
 
-        palier_lol = str(responsejson[0]["tier"])
-        division_lol = str(responsejson[0]["rank"])
-        league_point_lol = str(responsejson[0]["leaguePoints"])
-        wins_lol = responsejson[0]["wins"]
-        losses_lol = responsejson[0]["losses"]
-        winrate_sentence = None
-        if wins_lol+losses_lol != 0:
-            winrate_lol = (wins_lol/(wins_lol+losses_lol))*100
-            print(winrate_lol)
-            winrate_lol = str(winrate_lol)
-            print(winrate_lol)
-            winrate_lol = winrate_lol[0:5]
-            print(winrate_lol)
-            winrate_sentence = f" Soit un winrate de {winrate_lol}%"
+                soloq_sentence = f"\n{summoner_name} est {palier_lol} {division_lol} {league_point_lol} lp en soloq !\n" \
+                                 f"{summoner_name} a joué {wins_lol + losses_lol} games en soloq avec {wins_lol} wins "\
+                                 f" et {losses_lol} loses.{winrate_sentence}\n"
+
+            if (nb_of_ranks == 1 and (responsejson[0]["queueType"]=="RANKED_FLEX_SR" or
+                                      responsejson[1]["queueType"]=="RANKED_FLEX_SR")) or nb_of_ranks == 2:
+                i = -1
+                if responsejson[0]["queueType"]=="RANKED_FLEX_SR":
+                    i=0
+                else:
+                    i=1
+                palier_lol = str(responsejson[i]["tier"])
+                division_lol = str(responsejson[i]["rank"])
+                league_point_lol = str(responsejson[i]["leaguePoints"])
+                wins_lol = responsejson[i]["wins"]
+                losses_lol = responsejson[i]["losses"]
+                winrate_sentence = None
+                if wins_lol + losses_lol != 0:
+                    winrate_lol = str((wins_lol / (wins_lol + losses_lol)) * 100)[0:5]
+                    winrate_sentence = f" Soit un winrate de {winrate_lol}%"
+
+                flex_sentence = f"\n{summoner_name} est {palier_lol} {division_lol} {league_point_lol} lp en flex !\n" \
+                                 f"{summoner_name} a joué {wins_lol + losses_lol} games en flex avec {wins_lol} wins " \
+                                 f"et {losses_lol} loses.{winrate_sentence}\n"
 
         await ctx.channel.send(f"```__{summoner_name}__\n{summoner_name} est lvl {lvl} sur LoL !\n"
-                               f"{summoner_name} est {palier_lol} {division_lol} {league_point_lol} lp en soloq !\n"
-                               f"{summoner_name} a joué {wins_lol+losses_lol} games en soloq avec {wins_lol} wins et "
-                               f"{losses_lol} loses.{winrate_sentence}```")
+                               f"{soloq_sentence}{flex_sentence}```")
 
 
 def setup(bot):

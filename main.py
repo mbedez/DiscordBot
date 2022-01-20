@@ -7,7 +7,7 @@ from commandes import Sondage
 from commandes import LolAccount
 from abc import ABC
 
-from discord.ext.commands import Bot
+from discord.ext.commands import Bot, MissingRequiredArgument
 from discord import Intents
 
 from dotenv import load_dotenv
@@ -30,6 +30,12 @@ class DocBot(Bot, ABC):
         print(f"{self.user.display_name} est connecté au serveur.")
         print(" ")
 
+    async def on_command_error(self, ctx, exc):
+        if isinstance(exc, MissingRequiredArgument):
+            await ctx.send("Il manque au moins un paramètre. (&help)")
+        else:
+            pass
+
 
 bot = DocBot()
 
@@ -39,4 +45,4 @@ async def ping(message):
     await message.channel.send("pong")
 
 
-bot.run(os.getenv("TOKEN"))
+bot.run(os.getenv("TOKEN_TEST"))

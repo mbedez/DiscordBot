@@ -31,36 +31,36 @@ class LolAccount(Cog):
         soloq_sentence = f"\n{summoner_name} n'est pas classé en soloq !\n"
         flex_sentence = f"\n{summoner_name} n'est pas classé en flex !\n"
 
-        if nb_of_ranks == 1 and responsejson[0]["queueType"] == "RANKED_SOLO_5x5":
+        if nb_of_ranks == 1:
+            if responsejson[0]["queueType"] == "RANKED_SOLO_5x5":
+                palier_lol = str(responsejson[0]["tier"])
+                division_lol = str(responsejson[0]["rank"])
+                league_point_lol = str(responsejson[0]["leaguePoints"])
+                wins_lol = responsejson[0]["wins"]
+                losses_lol = responsejson[0]["losses"]
+                winrate_sentence = "Pas de game, pas de winrate..."
+                if wins_lol + losses_lol != 0:
+                    winrate_lol = str((wins_lol / (wins_lol + losses_lol)) * 100)[0:5]
+                    winrate_sentence = f" Soit un winrate de {winrate_lol}%"
 
-            palier_lol = str(responsejson[0]["tier"])
-            division_lol = str(responsejson[0]["rank"])
-            league_point_lol = str(responsejson[0]["leaguePoints"])
-            wins_lol = responsejson[0]["wins"]
-            losses_lol = responsejson[0]["losses"]
-            winrate_sentence = "Pas de game, pas de winrate..."
-            if wins_lol + losses_lol != 0:
-                winrate_lol = str((wins_lol / (wins_lol + losses_lol)) * 100)[0:5]
-                winrate_sentence = f" Soit un winrate de {winrate_lol}%"
+                soloq_sentence = f"\n{summoner_name} est {palier_lol} {division_lol} {league_point_lol} lp en soloq !\n" \
+                                 f"{summoner_name} a joué {wins_lol + losses_lol} games en soloq avec {wins_lol} wins "\
+                                 f" et {losses_lol} loses.{winrate_sentence}\n"
 
-            soloq_sentence = f"\n{summoner_name} est {palier_lol} {division_lol} {league_point_lol} lp en soloq !\n" \
-                             f"{summoner_name} a joué {wins_lol + losses_lol} games en soloq avec {wins_lol} wins "\
-                             f" et {losses_lol} loses.{winrate_sentence}\n"
+            elif responsejson[0]["queueType"] == "RANKED_FLEX_SR":
+                palier_lol = str(responsejson[0]["tier"])
+                division_lol = str(responsejson[0]["rank"])
+                league_point_lol = str(responsejson[0]["leaguePoints"])
+                wins_lol = responsejson[0]["wins"]
+                losses_lol = responsejson[0]["losses"]
+                winrate_sentence = "Pas de game, pas de winrate..."
+                if wins_lol + losses_lol != 0:
+                    winrate_lol = str((wins_lol / (wins_lol + losses_lol)) * 100)[0:5]
+                    winrate_sentence = f" Soit un winrate de {winrate_lol}%"
 
-        elif nb_of_ranks == 1 and responsejson[0]["queueType"] == "RANKED_FLEX_SR":
-            palier_lol = str(responsejson[0]["tier"])
-            division_lol = str(responsejson[0]["rank"])
-            league_point_lol = str(responsejson[0]["leaguePoints"])
-            wins_lol = responsejson[0]["wins"]
-            losses_lol = responsejson[0]["losses"]
-            winrate_sentence = "Pas de game, pas de winrate..."
-            if wins_lol + losses_lol != 0:
-                winrate_lol = str((wins_lol / (wins_lol + losses_lol)) * 100)[0:5]
-                winrate_sentence = f" Soit un winrate de {winrate_lol}%"
-
-            flex_sentence = f"\n{summoner_name} est {palier_lol} {division_lol} {league_point_lol} lp en flex !\n" \
-                            f"{summoner_name} a joué {wins_lol + losses_lol} games en flex avec {wins_lol} wins " \
-                            f" et {losses_lol} loses.{winrate_sentence}\n"
+                flex_sentence = f"\n{summoner_name} est {palier_lol} {division_lol} {league_point_lol} lp en flex !\n" \
+                                f"{summoner_name} a joué {wins_lol + losses_lol} games en flex avec {wins_lol} wins " \
+                                f" et {losses_lol} loses.{winrate_sentence}\n"
 
         elif nb_of_ranks >= 2:
 

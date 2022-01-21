@@ -29,24 +29,29 @@ class Sondage(Cog):
             histo = await ctx.message.channel.history(limit=50).flatten()
             first_reaction = True
             i = 0
-            nb_vote_green = 0
-            nb_vote_red = 0
             while histo[i].id != poll_id:
-                if post[-2:] == histo[i].content[-2:]:
+                if post[2:] == histo[i].content[2:]:
                     if post == histo[i].content:
                         await histo[i].delete()
                         first_reaction = False
                     else:
                         await histo[i].delete()
                 i += 1
-                if histo[i].content[-2:] == "🟩 ":
-                    nb_vote_green += 1
-                elif histo[i].content[-2:] == "🟥 ":
-                    nb_vote_red += 1
 
             if first_reaction:
                 await ctx.channel.send(post)
-                nb_vote_green += 1
+
+            i = 0
+            nb_vote_green = 0
+            nb_vote_red = 0
+
+            histo = await ctx.message.channel.history(limit=50).flatten()
+            while histo[i].id != poll_id:
+                if histo[i].content[:2] == "🟩 ":
+                    nb_vote_green += 1
+                elif histo[i].content[:2] == "🟥 ":
+                    nb_vote_red += 1
+                i += 1
 
             if nb_vote_green + nb_vote_red != 0:
                 percent = int((nb_vote_green / (nb_vote_green + nb_vote_red)) * 100)
@@ -62,24 +67,29 @@ class Sondage(Cog):
             histo = await ctx.message.channel.history(limit=50).flatten()
             first_reaction = True
             i = 0
-            nb_vote_green = 0
-            nb_vote_red = 0
             while histo[i].id != poll_id:
-                if post[-2:] == histo[i].content[-2:]:
+                if post[2:] == histo[i].content[2:]:
                     if post == histo[i].content:
                         await histo[i].delete()
                         first_reaction = False
                     else:
                         await histo[i].delete()
                 i += 1
-                if histo[i].content[-2:] == "🟩 ":
-                    nb_vote_green += 1
-                elif histo[i].content[-2:] == "🟥 ":
-                    nb_vote_red += 1
 
             if first_reaction:
                 await ctx.channel.send(post)
-                nb_vote_red += 1
+
+            i = 0
+            nb_vote_green = 0
+            nb_vote_red = 0
+
+            histo = await ctx.message.channel.history(limit=50).flatten()
+            while histo[i].id != poll_id:
+                if histo[i].content[:2] == "🟩 ":
+                    nb_vote_green += 1
+                elif histo[i].content[:2] == "🟥 ":
+                    nb_vote_red += 1
+                i += 1
 
             if nb_vote_green + nb_vote_red != 0:
                 percent = int((nb_vote_green / (nb_vote_green + nb_vote_red)) * 100)

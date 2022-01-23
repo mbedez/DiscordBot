@@ -21,6 +21,9 @@ FafBot runs in python with the help of the **pycord** package. In order to run t
 - pycord : `pip install py-cord`
 - dotenv : `pip install python-dotenv`
 - a *config* file containing your **discord Token** and your **Riot API Key**
+
+    pip install -r requirements.txt
+
 ***
 ## What is the future of FafBot
 I would like to add a feature : `&lolaccount` which would connect to the league of legends API and give back the **level** and **rank** of the given summoner name.

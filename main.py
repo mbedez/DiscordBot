@@ -5,6 +5,7 @@ from commandes import Delete
 from commandes import Help
 from commandes import Sondage
 from commandes import LolAccount
+from commandes import Shifumi
 from abc import ABC
 
 from discord.ext.commands import Bot, MissingRequiredArgument
@@ -14,7 +15,7 @@ from dotenv import load_dotenv
 
 load_dotenv(dotenv_path="config")
 
-COGS = [Morpion, Random, Delete, Help, Sondage, LolAccount]
+COGS = [Morpion, Random, Delete, Help, Sondage, LolAccount, Shifumi]
 
 
 class DocBot(Bot, ABC):

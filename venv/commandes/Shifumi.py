@@ -8,6 +8,8 @@ from discord import Member
 class Shifumi(Cog):
     def __init__(self, bot):
         self.bot = bot
+        self.choice_author = None
+        self.choice_guest = None
 
     @command(name='shifumi')
     async def shifumi(self, ctx: commands.Context, guest: Member):
@@ -27,34 +29,44 @@ class Shifumi(Cog):
         choice_author = None
         choice_guest = None
 
-        async def button_callback1(interaction, choice_author=choice_author, choice_guest=choice_guest):
+        async def button_callback1(interaction):
             if str(ctx.author) == str(interaction.user):
-                print(choice_author)
-                choice_author = "pierre"
-                print("choix auteur :", choice_author)
+                print(self.choice_author)
+                self.choice_author = "pierre"
+                print("choix auteur :", self.choice_author)
                 print(str(interaction.user)[:-5])
             elif guest.id == interaction.user.id:
-                choice_guest = "pierre"
-                print("choix invité :", choice_guest)
+                self.choice_guest = "pierre"
+                print("choix invité :", self.choice_guest)
 
-            if choice_author != None and choice_guest != None:
-                print("je")
-                if choice_guest != choice_author:
-                    print("suis")
+            if self.choice_author is not None and self.choice_guest is not None:
+                if self.choice_guest != self.choice_author:
                     await interaction.response.edit_message(content=f"todo")
                 else:
-                    print("là")
                     await interaction.response.edit_message(content="Égalité !")
 
         async def button_callback2(interaction):
-            print("coucou")
+            if str(ctx.author) == str(interaction.user):
+                print(self.choice_author)
+                self.choice_author = "feuille"
+                print("choix auteur :", self.choice_author)
+                print(str(interaction.user)[:-5])
+            elif guest.id == interaction.user.id:
+                self.choice_guest = "feuille"
+                print("choix invité :", self.choice_guest)
+
+            if self.choice_author is not None and self.choice_guest is not None:
+                if self.choice_guest != self.choice_author:
+                    await interaction.response.edit_message(content=f"todo")
+                else:
+                    await interaction.response.edit_message(content="Égalité !")
 
         async def button_callback3(interaction):
             print("coucou")
 
         button1.callback = button_callback1
         button2.callback = button_callback2
-        button2.callback = button_callback2
+        button3.callback = button_callback3
 
 
 def setup(bot):

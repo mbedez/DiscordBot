@@ -15,7 +15,7 @@ class Random(Cog):
 	@command(name='dice')
 	async def dice(self, ctx, value=6):
 		result = randint(1, value)
-		if value < 7 and value >0:
+		if 7 > value > 0:
 			if result == 1:
 				await ctx.channel.send(f"1️⃣")
 			if result == 2:
@@ -30,7 +30,9 @@ class Random(Cog):
 				await ctx.channel.send(f"6️⃣")
 		elif value >= 7:
 			await ctx.channel.send(f"Le dé doit comporter six faces ou moins.")
-		elif value <=0:
+		elif value <= 0:
 			await ctx.channel.send(f"Le dé doit comporter au moins une face.")
+
+
 def setup(bot):
 	bot.add_cog(Random(bot))

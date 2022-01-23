@@ -28,86 +28,108 @@ class LolAccount(Cog):
         responsejson = response.json()
         nb_of_ranks = len(responsejson)
 
-        soloq_sentence = f"\n{summoner_name} n'est pas classé en soloq !\n"
-        flex_sentence = f"\n{summoner_name} n'est pas classé en flex !\n"
+        soloq_sentence = f"\n__Soloq__\nPas classé !\n"
+        flex_sentence = f"\n__Flex__\nPas classé !\n"
+        tft_sentence = f"\n__TFT__\nPas classé !\n"
 
         if nb_of_ranks == 1:
             if responsejson[0]["queueType"] == "RANKED_SOLO_5x5":
-                palier_lol = str(responsejson[0]["tier"])
-                division_lol = str(responsejson[0]["rank"])
-                league_point_lol = str(responsejson[0]["leaguePoints"])
-                wins_lol = responsejson[0]["wins"]
-                losses_lol = responsejson[0]["losses"]
-                winrate_sentence = "Pas de game, pas de winrate..."
-                if wins_lol + losses_lol != 0:
-                    winrate_lol = str((wins_lol / (wins_lol + losses_lol)) * 100)[0:5]
-                    winrate_sentence = f" Soit un winrate de {winrate_lol}%"
-
-                soloq_sentence = f"\n{summoner_name} est {palier_lol} {division_lol} {league_point_lol} lp en soloq !\n" \
-                                 f"{summoner_name} a joué {wins_lol + losses_lol} games en soloq avec {wins_lol} wins "\
-                                 f" et {losses_lol} loses.{winrate_sentence}\n"
+                soloq_sentence = await self.soloq_sentence_maker(responsejson, 0)
 
             elif responsejson[0]["queueType"] == "RANKED_FLEX_SR":
-                palier_lol = str(responsejson[0]["tier"])
-                division_lol = str(responsejson[0]["rank"])
-                league_point_lol = str(responsejson[0]["leaguePoints"])
-                wins_lol = responsejson[0]["wins"]
-                losses_lol = responsejson[0]["losses"]
-                winrate_sentence = "Pas de game, pas de winrate..."
-                if wins_lol + losses_lol != 0:
-                    winrate_lol = str((wins_lol / (wins_lol + losses_lol)) * 100)[0:5]
-                    winrate_sentence = f" Soit un winrate de {winrate_lol}%"
+                flex_sentence = await self.flex_sentence_maker(responsejson, 0)
 
-                flex_sentence = f"\n{summoner_name} est {palier_lol} {division_lol} {league_point_lol} lp en flex !\n" \
-                                f"{summoner_name} a joué {wins_lol + losses_lol} games en flex avec {wins_lol} wins " \
-                                f" et {losses_lol} loses.{winrate_sentence}\n"
+            elif responsejson[0]["queueType"] == "TFT":
+                tft_sentence = await self.tft_sentence_maker(responsejson, 0)
 
-        elif nb_of_ranks >= 2:
-
+        elif nb_of_ranks == 2:
             if responsejson[0]["queueType"] == "RANKED_SOLO_5x5":
-                i = 0
+                soloq_sentence = await self.soloq_sentence_maker(responsejson, 0)
             elif responsejson[1]["queueType"] == "RANKED_SOLO_5x5":
-                i = 1
-            else:
-                i = 2
-            if i < 2:
-                palier_lol = str(responsejson[i]["tier"])
-                division_lol = str(responsejson[i]["rank"])
-                league_point_lol = str(responsejson[i]["leaguePoints"])
-                wins_lol = responsejson[i]["wins"]
-                losses_lol = responsejson[i]["losses"]
-                winrate_sentence = None
-                if wins_lol + losses_lol != 0:
-                    winrate_lol = str((wins_lol / (wins_lol + losses_lol)) * 100)[0:5]
-                    winrate_sentence = f" Soit un winrate de {winrate_lol}%"
-
-                soloq_sentence = f"\n{summoner_name} est {palier_lol} {division_lol} {league_point_lol} lp en soloq !\n" \
-                                 f"{summoner_name} a joué {wins_lol + losses_lol} games en soloq avec {wins_lol} wins "\
-                                 f" et {losses_lol} loses.{winrate_sentence}\n"
+                soloq_sentence = await self.soloq_sentence_maker(responsejson, 1)
 
             if responsejson[0]["queueType"] == "RANKED_FLEX_SR":
-                i = 0
+                flex_sentence = await self.flex_sentence_maker(responsejson, 0)
             elif responsejson[1]["queueType"] == "RANKED_FLEX_SR":
-                i = 1
-            else:
-                i = 2
-            if i < 2:
-                palier_lol = str(responsejson[i]["tier"])
-                division_lol = str(responsejson[i]["rank"])
-                league_point_lol = str(responsejson[i]["leaguePoints"])
-                wins_lol = responsejson[i]["wins"]
-                losses_lol = responsejson[i]["losses"]
-                winrate_sentence = None
-                if wins_lol + losses_lol != 0:
-                    winrate_lol = str((wins_lol / (wins_lol + losses_lol)) * 100)[0:5]
-                    winrate_sentence = f" Soit un winrate de {winrate_lol}%"
+                flex_sentence = await self.flex_sentence_maker(responsejson, 1)
 
-                flex_sentence = f"\n{summoner_name} est {palier_lol} {division_lol} {league_point_lol} lp en flex !\n" \
-                                f"{summoner_name} a joué {wins_lol + losses_lol} games en flex avec {wins_lol} wins " \
-                                f"et {losses_lol} loses.{winrate_sentence}\n"
+            if responsejson[0]["queueType"] == "TFT":
+                tft_sentence = await self.tft_sentence_maker(responsejson, 0)
+            elif responsejson[1]["queueType"] == "TFT":
+                tft_sentence = await self.tft_sentence_maker(responsejson, 1)
 
-        await ctx.channel.send(f"```\n__{summoner_name}__\n{summoner_name} est lvl {lvl} sur LoL !\n"
-                               f"{soloq_sentence}{flex_sentence}```")
+        elif nb_of_ranks == 3:
+            if responsejson[0]["queueType"] == "RANKED_SOLO_5x5":
+                soloq_sentence = await self.soloq_sentence_maker(responsejson, 0)
+            elif responsejson[1]["queueType"] == "RANKED_SOLO_5x5":
+                soloq_sentence = await self.soloq_sentence_maker(responsejson, 1)
+            elif responsejson[2]["queueType"] == "RANKED_SOLO_5x5":
+                soloq_sentence = await self.soloq_sentence_maker(responsejson, 2)
+
+            if responsejson[0]["queueType"] == "RANKED_FLEX_SR":
+                flex_sentence = await self.flex_sentence_maker(responsejson, 0)
+            elif responsejson[1]["queueType"] == "RANKED_FLEX_SR":
+                flex_sentence = await self.flex_sentence_maker(responsejson, 1)
+            elif responsejson[2]["queueType"] == "RANKED_FLEX_SR":
+                flex_sentence = await self.flex_sentence_maker(responsejson, 2)
+
+            if responsejson[0]["queueType"] == "TFT":
+                tft_sentence = await self.tft_sentence_maker(responsejson, 0)
+            elif responsejson[1]["queueType"] == "TFT":
+                tft_sentence = await self.tft_sentence_maker(responsejson, 1)
+            elif responsejson[2]["queueType"] == "TFT":
+                tft_sentence = await self.tft_sentence_maker(responsejson, 2)
+
+        await ctx.channel.send(f"```\n__{summoner_name}__\n{summoner_name} est lvl {lvl} sur LoL !\n\n"
+                               f"{soloq_sentence}{flex_sentence}{tft_sentence}```")
+
+    @staticmethod
+    async def soloq_sentence_maker(responsejson, i):
+        palier_lol = str(responsejson[i]["tier"])
+        division_lol = str(responsejson[i]["rank"])
+        league_point_lol = str(responsejson[i]["leaguePoints"])
+        wins_lol = responsejson[i]["wins"]
+        losses_lol = responsejson[i]["losses"]
+        winrate_sentence = None
+        if wins_lol + losses_lol != 0:
+            winrate_lol = str((wins_lol / (wins_lol + losses_lol)) * 100)[0:5]
+            winrate_sentence = f" Soit un winrate de {winrate_lol}%"
+
+        return f"\n__Soloq__\n{palier_lol} {division_lol} {league_point_lol} lp\n" \
+               f"A joué {wins_lol + losses_lol} games, " \
+               f"{wins_lol} wins/{losses_lol} loses.{winrate_sentence}\n"
+
+    @staticmethod
+    async def flex_sentence_maker(responsejson, i):
+        palier_lol = str(responsejson[i]["tier"])
+        division_lol = str(responsejson[i]["rank"])
+        league_point_lol = str(responsejson[i]["leaguePoints"])
+        wins_lol = responsejson[i]["wins"]
+        losses_lol = responsejson[i]["losses"]
+        winrate_sentence = None
+        if wins_lol + losses_lol != 0:
+            winrate_lol = str((wins_lol / (wins_lol + losses_lol)) * 100)[0:5]
+            winrate_sentence = f" Soit un winrate de {winrate_lol}%"
+
+        return f"\n__Flex__\n{palier_lol} {division_lol} {league_point_lol} lp\n" \
+               f"A joué {wins_lol + losses_lol} games, " \
+               f"{wins_lol} wins/{losses_lol} loses.{winrate_sentence}\n"
+
+    @staticmethod
+    async def tft_sentence_maker(responsejson, i):
+        palier_lol = str(responsejson[i]["tier"])
+        division_lol = str(responsejson[i]["rank"])
+        league_point_lol = str(responsejson[i]["leaguePoints"])
+        wins_lol = responsejson[i]["wins"]
+        losses_lol = responsejson[i]["losses"]
+        winrate_sentence = None
+        if wins_lol + losses_lol != 0:
+            winrate_lol = str((wins_lol / (wins_lol + losses_lol)) * 100)[0:5]
+            winrate_sentence = f" Soit un winrate de {winrate_lol}%"
+
+        return f"\n__TFT__\n{palier_lol} {division_lol} {league_point_lol} lp\n" \
+               f"A joué {wins_lol + losses_lol} games, " \
+               f"{wins_lol} wins/{losses_lol} loses.{winrate_sentence}\n"
 
 
 def setup(bot):

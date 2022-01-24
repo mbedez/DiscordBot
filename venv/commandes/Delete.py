@@ -31,6 +31,7 @@ class Delete(Cog):
             print(f"Message écrit par {str(message.author)} à {datetime.now().strftime('%H:%M:%S')} sur "
                   f"{str(message.channel)} : {str(message.content)}\n\n")
 
+    # unreferenced command without security that can delete n message
     @command(name='delete')
     async def delete(self, ctx, number_of_messages: int):
         messages = await ctx.channel.history(limit=number_of_messages + 1).flatten()

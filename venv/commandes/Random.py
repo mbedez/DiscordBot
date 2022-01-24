@@ -12,6 +12,7 @@ class Random(Cog):
 		result = randint(1, value)
 		await ctx.channel.send(f"{result}")
 
+	# dice is like random but only between 1 and 6 and respond only with emoji
 	@command(name='dice')
 	async def dice(self, ctx, value=6):
 		result = randint(1, value)

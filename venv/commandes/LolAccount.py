@@ -41,13 +41,9 @@ class LolAccount(Cog):
                 for i in range(nb_of_ranks):
                     if responsejson[i]["queueType"] == "RANKED_SOLO_5x5":
                         soloq_sentence = await self.sentence_maker(responsejson, i)
-
-                for i in range(nb_of_ranks):
-                    if responsejson[i]["queueType"] == "RANKED_FLEX_SR":
+                    elif responsejson[i]["queueType"] == "RANKED_FLEX_SR":
                         flex_sentence = await self.sentence_maker(responsejson, i)
-
-                for i in range(nb_of_ranks):
-                    if responsejson[i]["queueType"] == "RANKED_TFT_PAIRS":
+                    elif responsejson[i]["queueType"] == "RANKED_TFT_PAIRS":
                         tft_duo_sentence = await self.sentence_maker(responsejson, i)
 
         # create an url to get info on summoner tft rank by summoner id

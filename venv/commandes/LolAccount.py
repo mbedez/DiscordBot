@@ -34,8 +34,7 @@ class LolAccount(Cog):
         response = requests.get(url)
         responsejson = response.json()
         nb_of_ranks = len(responsejson)
-
-        # if ranked in soloq, flex or tft_duo
+        # if ranked in soloq or flex
         for j in range(3):
             if nb_of_ranks == j:
                 for i in range(nb_of_ranks):
@@ -43,8 +42,6 @@ class LolAccount(Cog):
                         soloq_sentence = await self.sentence_maker(responsejson, i)
                     elif responsejson[i]["queueType"] == "RANKED_FLEX_SR":
                         flex_sentence = await self.sentence_maker(responsejson, i)
-                    elif responsejson[i]["queueType"] == "RANKED_TFT_PAIRS":
-                        tft_duo_sentence = await self.sentence_maker(responsejson, i)
 
         # create an url to get info on summoner tft rank by summoner id
         url = f"https://euw1.api.riotgames.com/tft/league/v1/entries/by-summoner/{id_lol}?api_key={RIOT_KEY}"
@@ -52,38 +49,21 @@ class LolAccount(Cog):
         response = requests.get(url)
         responsejson = response.json()
         nb_of_ranks = len(responsejson)
-
-        # if ranked in tft
-        if nb_of_ranks == 1:
-            tft_sentence = await self.sentence_maker(responsejson, 0)
-
         await ctx.channel.send(f"```\n__{summoner_name}__\n{summoner_name} est lvl {lvl} sur LoL !\n\n"
-                               f"\n__Soloq__{soloq_sentence}\n__Flex__{flex_sentence}\n"
-                               f"__TFT__{tft_sentence}\n__TFT_DUO__{tft_duo_sentence}```")
+                               f"\n__Soloq__{soloq_sentence}\n__Flex__{flex_sentence}\n```")
 
     @staticmethod
     async def sentence_maker(responsejson, i):
+        palier_lol = str(responsejson[i]["tier"])
+        division_lol = str(responsejson[i]["rank"])
         league_point_lol = str(responsejson[i]["leaguePoints"])
         wins_lol = responsejson[i]["wins"]
         losses_lol = responsejson[i]["losses"]
         nb_games = wins_lol + losses_lol
         winrate_sentence = f" {str((wins_lol / (wins_lol + losses_lol)) * 100)[0:5]}% winrate"
 
-        # for ranked tft_duo sentence (no tier, rank and lp)
-        if responsejson[i]["queueType"] == "RANKED_TFT_PAIRS":
-            return f"\nA joué {nb_games} games, {wins_lol} Top 1.{winrate_sentence}\n"
-        else:
-            palier_lol = str(responsejson[i]["tier"])
-            division_lol = str(responsejson[i]["rank"])
-
-            # for ranked tft sentence (change win/lose by nb of Top 1)
-            if responsejson[i]["queueType"] == "RANKED_TFT":
-                return f"\n{palier_lol} {division_lol} {league_point_lol} lp\n" \
-                       f"A joué {nb_games} games, {wins_lol} Top 1.{winrate_sentence}\n"
-
-            # default sentence (soloq/flex)
-            return f"\n{palier_lol} {division_lol} {league_point_lol} lp\nA joué {nb_games} games, " \
-                   f"{wins_lol} wins/{losses_lol} loses.{winrate_sentence}\n"
+        return f"\n{palier_lol} {division_lol} {league_point_lol} lp\nA joué {nb_games} games, " \
+               f"{wins_lol} wins/{losses_lol} loses.{winrate_sentence}\n"
 
 
 def setup(bot):

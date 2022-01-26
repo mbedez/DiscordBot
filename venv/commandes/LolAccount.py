@@ -34,21 +34,14 @@ class LolAccount(Cog):
         response = requests.get(url)
         responsejson = response.json()
         nb_of_ranks = len(responsejson)
-        # if ranked in soloq or flex
-        for j in range(3):
-            if nb_of_ranks == j:
-                for i in range(nb_of_ranks):
-                    if responsejson[i]["queueType"] == "RANKED_SOLO_5x5":
-                        soloq_sentence = await self.sentence_maker(responsejson, i)
-                    elif responsejson[i]["queueType"] == "RANKED_FLEX_SR":
-                        flex_sentence = await self.sentence_maker(responsejson, i)
 
-        # create an url to get info on summoner tft rank by summoner id
-        url = f"https://euw1.api.riotgames.com/tft/league/v1/entries/by-summoner/{id_lol}?api_key={RIOT_KEY}"
-        url = str(url)
-        response = requests.get(url)
-        responsejson = response.json()
-        nb_of_ranks = len(responsejson)
+        # if ranked in soloq or flex
+        for i in range(nb_of_ranks):
+            if responsejson[i]["queueType"] == "RANKED_SOLO_5x5":
+                soloq_sentence = await self.sentence_maker(responsejson, i)
+            elif responsejson[i]["queueType"] == "RANKED_FLEX_SR":
+                flex_sentence = await self.sentence_maker(responsejson, i)
+
         await ctx.channel.send(f"```\n__{summoner_name}__\n{summoner_name} est lvl {lvl} sur LoL !\n\n"
                                f"\n__Soloq__{soloq_sentence}\n__Flex__{flex_sentence}\n```")
 

@@ -44,9 +44,8 @@ class LolAccount(Cog):
 
     @command(name='lolhisto')
     async def lolhisto(self, ctx, summoner_name, nb_game=5):
-        if nb_game > 30:
+        if not 0 < nb_game < 30:
             nb_game = 30
-
         summoner_name = str(summoner_name)
 
         responsejson = await self.id_taker(summoner_name)
@@ -66,7 +65,44 @@ class LolAccount(Cog):
             elif not (((match_lol["info"])["participants"])[j])["win"]:
                 message = f"{message}🟥"
         message = f"{message}```"
+
+        i = 0
+        max_lose_streak = 0
+        max_win_streak = 0
+        for caractere in message:
+            if i+1 != len(message):
+                count = 1
+                j = 1
+                while j < 7 and j != 100:
+                    if caractere == message[i+j] and caractere == "🟩":
+                        count = count+1
+                        if count > max_win_streak:
+                            max_win_streak = count
+                        j = j + 1
+                    elif caractere == message[i+j] and caractere == "🟥":
+                        count = count+1
+                        if count > max_lose_streak:
+                            max_lose_streak = count
+                        j = j + 1
+                    else:
+                        j = 100
+                i = i+1
+
         await ctx.channel.send(message)
+        posted_message = await ctx.channel.history(limit=1).flatten()
+
+        if 7 <= max_win_streak:
+            await posted_message[0].add_reaction("🥵")
+        elif 4 <= max_win_streak < 6:
+            await posted_message[0].add_reaction("😎")
+        elif 3 <= max_win_streak < 4:
+            await posted_message[0].add_reaction("☺")
+        if 6 <= max_lose_streak:
+            await posted_message[0].add_reaction("💀")
+        elif 4 <= max_lose_streak < 6:
+            await posted_message[0].add_reaction("😱")
+        elif 3 <= max_lose_streak < 4:
+            await posted_message[0].add_reaction("😖")
 
     @staticmethod
     async def sentence_maker(responsejson, i):

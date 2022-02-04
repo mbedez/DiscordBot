@@ -43,18 +43,23 @@ class LolAccount(Cog):
                                f"\n__Soloq__{soloq_sentence}\n__Flex__{flex_sentence}\n```")
 
     @command(name='lolhisto')
-    async def lolhisto(self, ctx, summoner_name, nb_game=5):
+    async def lolhisto(self, ctx, summoner_name, nb_game=5, type_queue="all"):
         if not 0 < nb_game < 30:
             nb_game = 30
         summoner_name = str(summoner_name)
 
         responsejson = await self.id_taker(summoner_name)
         puuid_lol = str(responsejson["puuid"])
-        histo_lol = await self.histo_taker(puuid_lol)
+        histo_lol = await self.histo_taker(puuid_lol, type_queue)
+
+        posted_message = await ctx.channel.send("```Recherche en cours...```")
 
         message = "```"
 
+        if nb_game > len(histo_lol):
+            nb_game = len(histo_lol)
         for i in range(nb_game):
+            await posted_message.edit(content=f"```Récupération de la game {i+1}```")
             match_lol = await self.match_info_taker(histo_lol[i])
             j = 0
             while (((match_lol["info"])["participants"])[j])["puuid"] != puuid_lol:
@@ -65,6 +70,8 @@ class LolAccount(Cog):
             elif not (((match_lol["info"])["participants"])[j])["win"]:
                 message = f"{message}🟥"
         message = f"{message}```"
+
+        await posted_message.edit(content=f"```Analyse des games...```")
 
         i = 0
         max_lose_streak = 0
@@ -88,21 +95,20 @@ class LolAccount(Cog):
                         j = 100
                 i = i+1
 
-        await ctx.channel.send(message)
-        posted_message = await ctx.channel.history(limit=1).flatten()
+        await posted_message.edit(content=message)
 
-        if 7 <= max_win_streak:
-            await posted_message[0].add_reaction("🥵")
+        if 6 <= max_win_streak:
+            await posted_message.add_reaction("🥵")
         elif 4 <= max_win_streak < 6:
-            await posted_message[0].add_reaction("😎")
+            await posted_message.add_reaction("😎")
         elif 3 <= max_win_streak < 4:
-            await posted_message[0].add_reaction("☺")
+            await posted_message.add_reaction("☺")
         if 6 <= max_lose_streak:
-            await posted_message[0].add_reaction("💀")
+            await posted_message.add_reaction("💀")
         elif 4 <= max_lose_streak < 6:
-            await posted_message[0].add_reaction("😱")
+            await posted_message.add_reaction("😱")
         elif 3 <= max_lose_streak < 4:
-            await posted_message[0].add_reaction("😖")
+            await posted_message.add_reaction("😖")
 
     @staticmethod
     async def sentence_maker(responsejson, i):
@@ -125,9 +131,19 @@ class LolAccount(Cog):
         return responsejson
 
     @staticmethod
-    async def histo_taker(puuid):
-        url = str(f"https://europe.api.riotgames.com/lol/match/v5/matches/by-puuid/"
-                  f"{puuid}/ids?type=ranked&start=0&count=30&api_key={RIOT_KEY}")
+    async def histo_taker(puuid, type):
+        # 420 queueId = soloq, 440 queueId = flex
+        if type == "soloq" or type == "flex":
+            if type == "soloq":
+                queueId = 420
+            else:
+                queueId = 440
+            url = str(f"https://europe.api.riotgames.com/lol/match/v5/matches/by-puuid/"
+                      f"{puuid}/ids?queue={queueId}&type=ranked&start=0&count=30&api_key={RIOT_KEY}")
+        else:
+            url = str(f"https://europe.api.riotgames.com/lol/match/v5/matches/by-puuid/"
+                      f"{puuid}/ids?type=ranked&start=0&count=30&api_key={RIOT_KEY}")
+
         responsejson = requests.get(url).json()
         return responsejson
 

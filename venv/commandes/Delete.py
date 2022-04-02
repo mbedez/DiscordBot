@@ -18,18 +18,20 @@ class Delete(Cog):
         bool_fc = False
         bool_nst = False
 
-        if (message.author.id == tom_id and bool_tom) or (message.channel.guild.id == serv_nst_id and
-                                                          message.channel.id != channel_hydra_id and
-                                                          message.author.id != probot_id and bool_nst) or \
-                (message.channel.guild.id == serv_fc_id and bool_fc):
-            messages = await message.channel.history(limit=1).flatten()
-            f = open('sortie.txt', 'a')
-            f.write(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n{str(message.author)}\n"
-                    f"{str(message.channel)}\n{str(message.content)}\n\n")
-            f.close()
-            await messages[0].delete()
-            print(f"Message écrit par {str(message.author)} à {datetime.now().strftime('%H:%M:%S')} sur "
-                  f"{str(message.channel)} : {str(message.content)}\n\n")
+        if str(message.channel.type) != 'private':
+
+            if (message.author.id == tom_id and bool_tom) or (message.channel.guild.id == serv_nst_id and
+                                                              message.channel.id != channel_hydra_id and
+                                                              message.author.id != probot_id and bool_nst) or \
+                    (message.channel.guild.id == serv_fc_id and bool_fc):
+                messages = await message.channel.history(limit=1).flatten()
+                f = open('sortie.txt', 'a')
+                f.write(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n{str(message.author)}\n"
+                        f"{str(message.channel)}\n{str(message.content)}\n\n")
+                f.close()
+                await messages[0].delete()
+                print(f"Message écrit par {str(message.author)} à {datetime.now().strftime('%H:%M:%S')} sur "
+                      f"{str(message.channel)} : {str(message.content)}\n\n")
 
     # unreferenced command without security that can delete n message
     @command(name='delete')

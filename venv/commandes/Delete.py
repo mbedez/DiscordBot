@@ -16,7 +16,6 @@ class Delete(Cog):
 
     @Cog.listener()
     async def on_message(self, message):
-<<<<<<< HEAD
         if (message.author.id == self.id_victime and message.channel.guild.id == self.id_serveur_cible and
                 self.delete_activation == True) :
             messages = await message.channel.history(limit=1).flatten()
@@ -28,31 +27,6 @@ class Delete(Cog):
             await messages[0].delete()
             '''print(f"Message écrit par {str(message.author)} à {datetime.now().strftime('%H:%M:%S')} sur "
                   f"{str(message.channel)} : {str(message.content)}\n\n")'''
-=======
-        serv_nst_id = 505198106350977024
-        serv_fc_id = 464811558048890880
-        channel_hydra_id = 930914775829987388
-        probot_id = 282859044593598464
-        tom_id = 181092186228654082
-        bool_tom = True
-        bool_fc = False
-        bool_nst = False
-
-        if str(message.channel.type) != 'private':
-
-            if (message.author.id == tom_id and bool_tom) or (message.channel.guild.id == serv_nst_id and
-                                                              message.channel.id != channel_hydra_id and
-                                                              message.author.id != probot_id and bool_nst) or \
-                    (message.channel.guild.id == serv_fc_id and bool_fc):
-                messages = await message.channel.history(limit=1).flatten()
-                f = open('sortie.txt', 'a')
-                f.write(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n{str(message.author)}\n"
-                        f"{str(message.channel)}\n{str(message.content)}\n\n")
-                f.close()
-                await messages[0].delete()
-                print(f"Message écrit par {str(message.author)} à {datetime.now().strftime('%H:%M:%S')} sur "
-                      f"{str(message.channel)} : {str(message.content)}\n\n")
->>>>>>> 1a0b73c914591def4e3981df18baecb8c24306e5
 
     # unreferenced command without security that can delete n message
     @command(name='deI')

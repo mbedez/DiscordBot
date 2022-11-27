@@ -60,40 +60,39 @@ class LolAccount(Cog):
             nb_game = len(histo_lol)
         for i in range(nb_game):
             await posted_message.edit(content=f"```Récupération de la game {i+1}```")
-            match_lol = await self.match_info_taker(histo_lol[i])
+            match_lol = await self.match_info_taker(histo_lol[nb_game-i-1])
             j = 0
             while (((match_lol["info"])["participants"])[j])["puuid"] != puuid_lol:
                 j = j+1
 
+            kda = f"{match_lol['info']['participants'][j]['kills']}/{match_lol['info']['participants'][j]['deaths']}/" \
+                  f"{match_lol['info']['participants'][j]['assists']}"
+            championName=f"{match_lol['info']['participants'][j]['championName']}"
+
             if(((match_lol["info"])["participants"])[j])["win"]:
-                message = f"{message}🟩"
+                message = f"{message}🟩 {kda} {championName}\n"
             elif not (((match_lol["info"])["participants"])[j])["win"]:
-                message = f"{message}🟥"
+                message = f"{message}🟥 {kda} {championName}\n"
         message = f"{message}```"
 
         await posted_message.edit(content=f"```Analyse des games...```")
 
-        i = 0
         max_lose_streak = 0
         max_win_streak = 0
-        for caractere in message:
-            if i+1 != len(message):
-                count = 1
-                j = 1
-                while j < 7 and j != 100:
-                    if caractere == message[i+j] and caractere == "🟩":
-                        count = count+1
-                        if count > max_win_streak:
-                            max_win_streak = count
-                        j = j + 1
-                    elif caractere == message[i+j] and caractere == "🟥":
-                        count = count+1
-                        if count > max_lose_streak:
-                            max_lose_streak = count
-                        j = j + 1
-                    else:
-                        j = 100
-                i = i+1
+
+        win_streak = 0
+        lose_streak = 0
+        for character in message:
+            if character == "🟩":
+                win_streak += 1
+                if win_streak > max_win_streak:
+                    max_win_streak = win_streak
+                lose_streak = 0
+            elif character == "🟥":
+                lose_streak += 1
+                if lose_streak > max_lose_streak:
+                    max_lose_streak = lose_streak
+                win_streak = 0
 
         await posted_message.edit(content=message)
 

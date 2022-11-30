@@ -1,12 +1,12 @@
 import os
-from commandes import Morpion
-from commandes import Random
-from commandes import Delete
-from commandes import Help
-from commandes import Sondage
-from commandes import LolAccount
-from commandes import Shifumi
-from commandes import Motus
+from functions import Morpion
+from functions import Random
+from functions import Delete
+from functions import Help
+from functions import Sondage
+from functions import LolAccount
+from functions import Shifumi
+from functions import Motus
 from abc import ABC
 
 from discord.ext.commands import Bot, MissingRequiredArgument

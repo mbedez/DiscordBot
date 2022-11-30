@@ -13,6 +13,28 @@ class LolAccount(Cog):
     def __init__(self, bot):
         self.bot = bot
 
+    @command(name='lolcodril')
+    async def lolcodril(self, ctx):
+        start = 0
+        start = str(start)
+        url = f"https://europe.api.riotgames.com/lol/match/v5/matches/by-puuid/FqhMWJLaiyWQPXO3eX8pVfnDb9MaKxDQEYA7OYzxjOQDb5KVSbHARdwuLBFpwwg1KCrQRExWHQcXcA/ids?queue=450&start={start}&count=100&api_key={RIOT_KEY}"
+        url = str(url)
+        response = requests.get(url)
+        responsejson = response.json()
+        all_aram = len(responsejson)
+
+        while len(responsejson) == 100:
+            start = int(start)
+            start +=100
+            start = str(start)
+            url = f"https://europe.api.riotgames.com/lol/match/v5/matches/by-puuid/FqhMWJLaiyWQPXO3eX8pVfnDb9MaKxDQEYA7OYzxjOQDb5KVSbHARdwuLBFpwwg1KCrQRExWHQcXcA/ids?queue=450&start={start}&count=100&api_key={RIOT_KEY}"
+            url = str(url)
+            response = requests.get(url)
+            responsejson = response.json()
+            all_aram += len(responsejson)
+
+        await ctx.channel.send(f"```Codril a fait {all_aram} ARAM cette saison !```")
+
     @command(name='lolaccount')
     async def lol_account(self, ctx, summoner_name):
         summoner_name = str(summoner_name)

@@ -67,6 +67,9 @@ class LolAccount(Cog):
 
             kda = f"{match_lol['info']['participants'][j]['kills']}/{match_lol['info']['participants'][j]['deaths']}/" \
                   f"{match_lol['info']['participants'][j]['assists']}"
+
+            kda = kda.ljust(8)
+
             championName=f"{match_lol['info']['participants'][j]['championName']}"
 
             if(((match_lol["info"])["participants"])[j])["win"]:

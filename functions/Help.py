@@ -15,7 +15,9 @@ class Help(Cog):
                                "les rangs du compte indiqué\n"
                                "**&lolhisto \"summoner_name\" (Optionnel : n, Optionnel : type)** : "
                                "affiche le résultats des n games "
-                               "(5 par défaut) de flex et soloq (ou du type précisé) de l'historique en emoji\n\n"
+                               "(5 par défaut) de flex et soloq (ou du type précisé) de l'historique en emoji\n"
+                               "**&lolaram \"summoner_name\"** : "
+                               "affiche le nombre d'aram de l'invocateur et la date de sa dernière aram\n\n"
                                "**&poll \"question\" \"first_option\" \"second_option\"** : "
                                "lance un sondage auquel tout le monde peut répondre\n\n"
                                "**&morpion @member** : lance une partie de morpion avec **@member**\n")

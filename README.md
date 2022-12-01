@@ -16,6 +16,8 @@ Here's a list of different things you could do with this bot:
 - **&poll** *"question"* *first_option* *second_option* => Makes a poll that everyone can respond to.
 - **&delete** *int* => Delete the last *int* messages.
 - **&lolaccount** *summoner_name* => give you the level of the summoner and all his ranks.
+- **&lolhisto** *summoner_name* ( Optional : *nb_of_game (<=30)* *queue (soloq or flex)*) => give you the last nb_of_game of the summoner with the result (win or lose, kda) and the played champion.
+- **&lolaram** *summoner_name* => give you the number of aram the summoner did and the date of his last aram.
 ***
 ## What do you need in order to set FafBot up?
 FafBot runs in python with the help of the **pycord** package. In order to run the bot, you will need a few things :
@@ -29,4 +31,4 @@ You can use `pip install -r requirements.txt` to install the necessary libraries
 
 ***
 ## What is the future of FafBot
-I would like to add some features with Riot API. (Need a Personnal API Key)
+idk

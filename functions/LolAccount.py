@@ -4,6 +4,8 @@ from discord.ext.commands import command
 import os
 import requests
 from dotenv import load_dotenv
+import datetime
+
 
 load_dotenv(dotenv_path="config")
 RIOT_KEY = (os.getenv("RIOT_KEY"))
@@ -13,27 +15,37 @@ class LolAccount(Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @command(name='lolcodril')
-    async def lolcodril(self, ctx):
+    @command(name='lolaram')
+    async def lolaram(self, ctx, summoner_name):
+
+        responsejson = await self.id_taker(summoner_name)
+        summoner_PUUID = str(responsejson["puuid"])
+
         start = 0
         start = str(start)
-        url = f"https://europe.api.riotgames.com/lol/match/v5/matches/by-puuid/FqhMWJLaiyWQPXO3eX8pVfnDb9MaKxDQEYA7OYzxjOQDb5KVSbHARdwuLBFpwwg1KCrQRExWHQcXcA/ids?queue=450&start={start}&count=100&api_key={RIOT_KEY}"
+        url = f"https://europe.api.riotgames.com/lol/match/v5/matches/by-puuid/{summoner_PUUID}/ids?queue=450&start={start}&count=100&api_key={RIOT_KEY}"
         url = str(url)
         response = requests.get(url)
         responsejson = response.json()
         all_aram = len(responsejson)
 
+
+        last_aram = await self.match_info_taker(responsejson[0])
+        last_aram_date = int(last_aram["info"]["gameCreation"])
+        last_aram_date = datetime.datetime.fromtimestamp(last_aram_date/1000).strftime('%Y-%m-%d %H:%M:%S')[:-3]
+
         while len(responsejson) == 100:
             start = int(start)
             start +=100
             start = str(start)
-            url = f"https://europe.api.riotgames.com/lol/match/v5/matches/by-puuid/FqhMWJLaiyWQPXO3eX8pVfnDb9MaKxDQEYA7OYzxjOQDb5KVSbHARdwuLBFpwwg1KCrQRExWHQcXcA/ids?queue=450&start={start}&count=100&api_key={RIOT_KEY}"
+
+            url = f"https://europe.api.riotgames.com/lol/match/v5/matches/by-puuid/{summoner_PUUID}/ids?queue=450&start={start}&count=100&api_key={RIOT_KEY}"
             url = str(url)
             response = requests.get(url)
             responsejson = response.json()
             all_aram += len(responsejson)
 
-        await ctx.channel.send(f"```Codril a fait {all_aram} ARAM cette saison !```")
+        await ctx.channel.send(f"```{summoner_name} a fait {all_aram} ARAM cette saison !\nSa dernière game était le {last_aram_date[:-6]} à {last_aram_date[-5:]}```")
 
     @command(name='lolaccount')
     async def lol_account(self, ctx, summoner_name):

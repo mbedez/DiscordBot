@@ -19,15 +19,15 @@ class Random(Cog):
 		if 7 > value > 0:
 			if result == 1:
 				await ctx.channel.send(f"1️⃣")
-			if result == 2:
+			elif result == 2:
 				await ctx.channel.send(f"2️⃣")
-			if result == 3:
+			elif result == 3:
 				await ctx.channel.send(f"3️⃣")
-			if result == 4:
+			elif result == 4:
 				await ctx.channel.send(f"4️⃣")
-			if result == 5:
+			elif result == 5:
 				await ctx.channel.send(f"5️⃣")
-			if result == 6:
+			elif result == 6:
 				await ctx.channel.send(f"6️⃣")
 		elif value >= 7:
 			await ctx.channel.send(f"Le dé doit comporter six faces ou moins.")

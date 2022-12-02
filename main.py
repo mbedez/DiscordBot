@@ -2,7 +2,7 @@ import os
 from functions import Morpion,Random,Delete,Help,Sondage,LolAccount,Shifumi,Motus
 from abc import ABC
 
-from discord.ext.commands import Bot, MissingRequiredArgument
+from discord.ext.commands import Bot, MissingRequiredArgument, TooManyArguments
 from discord import Intents
 
 from dotenv import load_dotenv
@@ -28,6 +28,8 @@ class DocBot(Bot, ABC):
     async def on_command_error(self, ctx, exc):
         if isinstance(exc, MissingRequiredArgument):
             await ctx.send("Il manque au moins un paramètre. (&help)")
+        elif isinstance(exc, TooManyArguments):
+            await ctx.send("Il a trop de paramètres. (&help)")
         else:
             pass
 

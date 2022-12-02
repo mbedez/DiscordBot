@@ -18,13 +18,12 @@ class Delete(Cog):
     async def on_message(self, message):
         if (message.author.id == self.id_victime and message.channel.guild.id == self.id_serveur_cible and
                 self.delete_activation == True) :
-            messages = await message.channel.history(limit=1).flatten()
             f = open('sortie.txt', 'a')
             f.write(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n{str(message.author)}\n"
                     f"{str(message.channel)}\n{str(message.content)}\n\n")
             f.close()
             time.sleep(randint(self.delete_min, self.delete_max))
-            await messages[0].delete()
+            await message.delete()
             '''print(f"Message écrit par {str(message.author)} à {datetime.now().strftime('%H:%M:%S')} sur "
                   f"{str(message.channel)} : {str(message.content)}\n\n")'''
 
@@ -61,12 +60,14 @@ class Delete(Cog):
 
     @command(name='set_delete_max')
     async def set_delete_max(self, ctx, max: int):
-        self.delete_max = max
+        if max >= self.delete_min:
+            self.delete_max = max
         await ctx.channel.send(f"La durée maximum avant suppression est de {self.delete_max}s.")
 
     @command(name='set_delete_min')
     async def set_delete_min(self, ctx, min: int):
-        self.delete_min = min
+        if min <= self.delete_max:
+            self.delete_min = min
         await ctx.channel.send(f"La durée minimum avant suppression est de {self.delete_min}s.")
 
 

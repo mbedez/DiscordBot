@@ -73,8 +73,36 @@ class LolAccount(Cog):
             elif responsejson[i]["queueType"] == "RANKED_FLEX_SR":
                 flex_sentence = await self.sentence_maker(responsejson, i)
 
+        responsejson = await self.id_taker(summoner_name)
+        summoner_PUUID = str(responsejson["puuid"])
+
+        start = 0
+        start = str(start)
+        url = f"https://europe.api.riotgames.com/lol/match/v5/matches/by-puuid/{summoner_PUUID}/ids?queue=450&start={start}&count=100&api_key={RIOT_KEY}"
+
+        responsejson = requests.get(url).json()
+        all_aram = len(responsejson)
+
+
+        last_aram = await self.match_info_taker(responsejson[0])
+        last_aram_date = int(last_aram["info"]["gameCreation"])
+        last_aram_date = datetime.datetime.fromtimestamp(last_aram_date/1000).strftime('%Y-%m-%d %H:%M:%S')[:-3]
+
+        while len(responsejson) == 100:
+            start = int(start)
+            start +=100
+            start = str(start)
+
+            url = f"https://europe.api.riotgames.com/lol/match/v5/matches/by-puuid/{summoner_PUUID}/ids?queue=450&start={start}&count=100&api_key={RIOT_KEY}"
+            url = str(url)
+            response = requests.get(url)
+            responsejson = response.json()
+            all_aram += len(responsejson)
+
+        aram_sentence = f"\nA joué {all_aram} ARAM cette saison !\nSa dernière ARAM était le {last_aram_date[:-6]} à {last_aram_date[-5:]}\n"
+
         await ctx.channel.send(f"```\n__{summoner_name}__\n{summoner_name} est lvl {lvl} sur LoL !\n\n"
-                               f"\n__Soloq__{soloq_sentence}\n__Flex__{flex_sentence}\n```")
+                               f"\n__Soloq__{soloq_sentence}\n__Flex__{flex_sentence}\n__ARAM__{aram_sentence}```")
 
     @command(name='lolhisto')
     async def lolhisto(self, ctx, summoner_name, nb_game=5, type_queue="all"):

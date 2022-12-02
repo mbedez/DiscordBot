@@ -1,15 +1,14 @@
 import os
-from functions import Morpion,Random,Delete,Help,Sondage,LolAccount,Shifumi,Motus
+from functions import Morpion,Random,Delete,Help,Sondage,LolAccount,Shifumi
 from abc import ABC
 
 from discord.ext.commands import Bot, MissingRequiredArgument, TooManyArguments
 from discord import Intents
-
 from dotenv import load_dotenv
 
 load_dotenv(dotenv_path="config")
 
-COGS = [Morpion, Random, Delete, Help, Sondage, LolAccount, Shifumi, Motus]
+COGS = [Morpion, Random, Delete, Help, Sondage, LolAccount, Shifumi]
 
 
 class DocBot(Bot, ABC):

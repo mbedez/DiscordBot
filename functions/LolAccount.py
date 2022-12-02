@@ -15,38 +15,6 @@ class LolAccount(Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @command(name='lolaram')
-    async def lolaram(self, ctx, summoner_name):
-
-        responsejson = await self.id_taker(summoner_name)
-        summoner_PUUID = str(responsejson["puuid"])
-
-        start = 0
-        start = str(start)
-        url = f"https://europe.api.riotgames.com/lol/match/v5/matches/by-puuid/{summoner_PUUID}/ids?queue=450&start={start}&count=100&api_key={RIOT_KEY}"
-        url = str(url)
-        response = requests.get(url)
-        responsejson = response.json()
-        all_aram = len(responsejson)
-
-
-        last_aram = await self.match_info_taker(responsejson[0])
-        last_aram_date = int(last_aram["info"]["gameCreation"])
-        last_aram_date = datetime.datetime.fromtimestamp(last_aram_date/1000).strftime('%Y-%m-%d %H:%M:%S')[:-3]
-
-        while len(responsejson) == 100:
-            start = int(start)
-            start +=100
-            start = str(start)
-
-            url = f"https://europe.api.riotgames.com/lol/match/v5/matches/by-puuid/{summoner_PUUID}/ids?queue=450&start={start}&count=100&api_key={RIOT_KEY}"
-            url = str(url)
-            response = requests.get(url)
-            responsejson = response.json()
-            all_aram += len(responsejson)
-
-        await ctx.channel.send(f"```{summoner_name} a fait {all_aram} ARAM cette saison !\nSa dernière game était le {last_aram_date[:-6]} à {last_aram_date[-5:]}```")
-
     @command(name='lolaccount')
     async def lol_account(self, ctx, summoner_name):
         summoner_name = str(summoner_name)
@@ -61,7 +29,6 @@ class LolAccount(Cog):
 
         # create an url to get info on summoner ranks by summoner id
         url = f"https://euw1.api.riotgames.com/lol/league/v4/entries/by-summoner/{id_lol}?api_key={RIOT_KEY}"
-        url = str(url)
         response = requests.get(url)
         responsejson = response.json()
         nb_of_ranks = len(responsejson)
@@ -83,10 +50,12 @@ class LolAccount(Cog):
         responsejson = requests.get(url).json()
         all_aram = len(responsejson)
 
-
-        last_aram = await self.match_info_taker(responsejson[0])
-        last_aram_date = int(last_aram["info"]["gameCreation"])
-        last_aram_date = datetime.datetime.fromtimestamp(last_aram_date/1000).strftime('%Y-%m-%d %H:%M:%S')[:-3]
+        last_aram_date = ""
+        if len(responsejson) != 0:
+            last_aram = await self.match_info_taker(responsejson[0])
+            last_aram_date = int(last_aram["info"]["gameCreation"])
+            last_aram_date = datetime.datetime.fromtimestamp(last_aram_date/1000).strftime('%Y-%m-%d %H:%M:%S')[:-3]
+            last_aram_date = f"\nSa dernière ARAM était le {last_aram_date[:-6]} à {last_aram_date[-5:]}\n"
 
         while len(responsejson) == 100:
             start = int(start)
@@ -94,12 +63,10 @@ class LolAccount(Cog):
             start = str(start)
 
             url = f"https://europe.api.riotgames.com/lol/match/v5/matches/by-puuid/{summoner_PUUID}/ids?queue=450&start={start}&count=100&api_key={RIOT_KEY}"
-            url = str(url)
-            response = requests.get(url)
-            responsejson = response.json()
+            responsejson = requests.get(url).json()
             all_aram += len(responsejson)
 
-        aram_sentence = f"\nA joué {all_aram} ARAM cette saison !\nSa dernière ARAM était le {last_aram_date[:-6]} à {last_aram_date[-5:]}\n"
+        aram_sentence = f"\nA joué {all_aram} ARAM cette saison !{last_aram_date}\n"
 
         await ctx.channel.send(f"```\n__{summoner_name}__\n{summoner_name} est lvl {lvl} sur LoL !\n\n"
                                f"\n__Soloq__{soloq_sentence}\n__Flex__{flex_sentence}\n__ARAM__{aram_sentence}```")
@@ -213,7 +180,7 @@ class LolAccount(Cog):
 
     @staticmethod
     async def match_info_taker(match_id):
-        url = str(f"https://europe.api.riotgames.com/lol/match/v5/matches/{match_id}?api_key={RIOT_KEY}")
+        url = f"https://europe.api.riotgames.com/lol/match/v5/matches/{match_id}?api_key={RIOT_KEY}"
         responsejson = requests.get(url).json()
         return responsejson
 

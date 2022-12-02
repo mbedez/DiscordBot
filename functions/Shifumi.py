@@ -9,6 +9,8 @@ class Shifumi(Cog):
     @command(name='shifumi')
     async def shifumi(self, ctx):
 
+        messages = await ctx.channel.history(limit=1).flatten()
+        await messages[0].delete()
         posted_message = await ctx.channel.send("SHIFUMI")
         await posted_message.add_reaction("🪨")
         await posted_message.add_reaction("🧾")

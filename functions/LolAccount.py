@@ -1,3 +1,4 @@
+import discord
 from discord.ext.commands import Cog
 from discord.ext.commands import command
 
@@ -5,6 +6,8 @@ import os
 import requests
 from dotenv import load_dotenv
 import datetime
+
+from PIL import Image, ImageDraw, ImageFont
 
 
 load_dotenv(dotenv_path="config")
@@ -17,6 +20,27 @@ class LolAccount(Cog):
 
     @command(name='lolaccount')
     async def lol_account(self, ctx, summoner_name):
+
+        lolAccountFields = {'nameField': (1313, 730),
+                            'levelField': (2800,725),
+                            'soloqGamesField': (900,1600),
+                            'soloqRankField': (900,2130),
+                            'soloqPointsField': (900,2230),
+                            'soloqRatioField': (900,2760),
+                            'soloqWinrateField': (900,2880),
+                            'flexGamesField': (1768,1600),
+                            'flexRankField': (1768,2130),
+                            'flexPointsField': (1768,2230),
+                            'flexRatioField': (1768,2760),
+                            'flexWinrateField': (1768,2880),
+                            'aramGamesField': (2648,1600),
+                            'aramLastGameDayField': (2648,2130),
+                            'aramLastGameHourField': (2648,2230)}
+
+        # Open an image and editing it
+        template = Image.open('assets/template.png')
+        draw = ImageDraw.Draw(template)
+
         summoner_name = str(summoner_name)
 
         # create an url to get info on summoner by summoner name
@@ -33,29 +57,47 @@ class LolAccount(Cog):
         responsejson = response.json()
         nb_of_ranks = len(responsejson)
 
+        soloq_palier_lol = soloq_division_lol = flex_palier_lol= flex_division_lol = ' '
+        soloq_league_point_lol = flex_league_point_lol = soloq_nb_of_games = flex_nb_of_games= '0'
+        soloq_losses_lol = soloq_wins_lol = flex_wins_lol = flex_losses_lol = '0'
+        soloq_winrate = flex_winrate = '    0'
+
         # if ranked in soloq or flex
         for i in range(nb_of_ranks):
             if responsejson[i]["queueType"] == "RANKED_SOLO_5x5":
-                soloq_sentence = await self.sentence_maker(responsejson, i)
+                soloq_palier_lol = str(responsejson[i]["tier"])
+                soloq_division_lol = str(responsejson[i]["rank"])
+                soloq_league_point_lol = str(responsejson[i]["leaguePoints"])
+                soloq_wins_lol = responsejson[i]["wins"]
+                soloq_losses_lol = responsejson[i]["losses"]
+                soloq_winrate = str(int(soloq_wins_lol) / (int(soloq_wins_lol) + int(soloq_losses_lol))*100)
+                soloq_nb_of_games = int(soloq_wins_lol) + int(soloq_losses_lol)
             elif responsejson[i]["queueType"] == "RANKED_FLEX_SR":
-                flex_sentence = await self.sentence_maker(responsejson, i)
+                flex_palier_lol = str(responsejson[i]["tier"])
+                flex_division_lol = str(responsejson[i]["rank"])
+                flex_league_point_lol = str(responsejson[i]["leaguePoints"])
+                flex_wins_lol = responsejson[i]["wins"]
+                flex_losses_lol = responsejson[i]["losses"]
+                flex_winrate = str(int(flex_wins_lol) / (int(flex_wins_lol) + int(flex_losses_lol))*100)
+                flex_nb_of_games = int(flex_wins_lol) + int(flex_losses_lol)
+
 
         responsejson = await self.id_taker(summoner_name)
         summoner_PUUID = str(responsejson["puuid"])
 
-        start = 0
-        start = str(start)
+        start = str(0)
         url = f"https://europe.api.riotgames.com/lol/match/v5/matches/by-puuid/{summoner_PUUID}/ids?queue=450&start={start}&count=100&api_key={RIOT_KEY}"
 
         responsejson = requests.get(url).json()
         all_aram = len(responsejson)
+
+        last_aram= last_aram_date = '      '        
 
         last_aram_date = ""
         if len(responsejson) != 0:
             last_aram = await self.match_info_taker(responsejson[0])
             last_aram_date = int(last_aram["info"]["gameCreation"])
             last_aram_date = datetime.datetime.fromtimestamp(last_aram_date/1000).strftime('%Y-%m-%d %H:%M:%S')[:-3]
-            last_aram_date = f"\nSa dernière ARAM était le {last_aram_date[:-6]} à {last_aram_date[-5:]}\n"
 
         while len(responsejson) == 100:
             start = int(start)
@@ -66,10 +108,57 @@ class LolAccount(Cog):
             responsejson = requests.get(url).json()
             all_aram += len(responsejson)
 
-        aram_sentence = f"\nA joué {all_aram} ARAM cette saison !{last_aram_date}\n"
 
-        await ctx.channel.send(f"```\n__{summoner_name}__\n{summoner_name} est lvl {lvl} sur LoL !\n\n"
-                               f"\n__Soloq__{soloq_sentence}\n__Flex__{flex_sentence}\n__ARAM__{aram_sentence}```")
+        
+        myFont = ImageFont.truetype('./fonts/lolAccountFont.ttf', 250)
+
+        _, _, r, b = draw.textbbox((0,0), summoner_name, font=myFont)
+        draw.text((lolAccountFields["nameField"][0]-r/2, lolAccountFields["nameField"][1]-b/2), summoner_name, font=myFont, fill=('#c5c5c5'))
+        _, _, r, b = draw.textbbox((0,0), lvl, font=myFont)
+        draw.text((lolAccountFields["levelField"][0]-r/2, lolAccountFields["levelField"][1]-b/2), lvl, font=myFont, fill=('#c5c5c5'))
+
+
+        myFont = ImageFont.truetype('./fonts/lolAccountFont.ttf', 200)
+
+        _, _, r, b = draw.textbbox((0,0), str(soloq_nb_of_games), font=myFont)
+        draw.text((lolAccountFields["soloqGamesField"][0]-r/2, lolAccountFields["soloqGamesField"][1]-b/2), str(soloq_nb_of_games), font=myFont, fill=('#c5c5c5'))
+        _, _, r, b = draw.textbbox((0,0), str(flex_nb_of_games), font=myFont)
+        draw.text((lolAccountFields["flexGamesField"][0]-r/2, lolAccountFields["flexGamesField"][1]-b/2), str(flex_nb_of_games), font=myFont, fill=('#c5c5c5'))
+        _, _, r, b = draw.textbbox((0,0), str(all_aram), font=myFont)
+        draw.text((lolAccountFields["aramGamesField"][0]-r/2, lolAccountFields["aramGamesField"][1]-b/2), str(all_aram), font=myFont, fill=('#c5c5c5'))
+
+
+        myFont = ImageFont.truetype('./fonts/lolAccountFont.ttf', 100)
+
+        _, _, r, b = draw.textbbox((0,0), f'{soloq_palier_lol} {soloq_division_lol}', font=myFont)
+        draw.text((lolAccountFields["soloqRankField"][0]-r/2, lolAccountFields["soloqRankField"][1]-b/2), f'{soloq_palier_lol} {soloq_division_lol}', font=myFont, fill=('#c5c5c5'))
+        _, _, r, b = draw.textbbox((0,0), f'{flex_palier_lol} {flex_division_lol}', font=myFont)
+        draw.text((lolAccountFields["flexRankField"][0]-r/2, lolAccountFields["flexRankField"][1]-b/2), f'{flex_palier_lol} {flex_division_lol}', font=myFont, fill=('#c5c5c5'))
+        _, _, r, b = draw.textbbox((0,0), last_aram_date[:-6], font=myFont)
+        draw.text((lolAccountFields["aramLastGameDayField"][0]-r/2, lolAccountFields["aramLastGameDayField"][1]-b/2), last_aram_date[:-6], font=myFont, fill=('#c5c5c5'))
+        
+        _, _, r, b = draw.textbbox((0,0), f'{str(soloq_league_point_lol)} lp', font=myFont)
+        draw.text((lolAccountFields["soloqPointsField"][0]-r/2, lolAccountFields["soloqPointsField"][1]-b/2), f'{str(soloq_league_point_lol)} lp', font=myFont, fill=('#c5c5c5'))
+        _, _, r, b = draw.textbbox((0,0), f'{str(flex_league_point_lol)} lp', font=myFont)
+        draw.text((lolAccountFields["flexPointsField"][0]-r/2, lolAccountFields["flexPointsField"][1]-b/2), f'{str(flex_league_point_lol)} lp', font=myFont, fill=('#c5c5c5'))
+        _, _, r, b = draw.textbbox((0,0), last_aram_date[-5:], font=myFont)
+        draw.text((lolAccountFields["aramLastGameHourField"][0]-r/2, lolAccountFields["aramLastGameHourField"][1]-b/2), last_aram_date[-5:], font=myFont, fill=('#c5c5c5'))
+
+        _, _, r, b = draw.textbbox((0,0), f'{soloq_wins_lol}W/{soloq_losses_lol}L', font=myFont)
+        draw.text((lolAccountFields["soloqRatioField"][0]-r/2, lolAccountFields["soloqRatioField"][1]-b/2), f'{soloq_wins_lol}W/{soloq_losses_lol}L', font=myFont, fill=('#c5c5c5'))
+        _, _, r, b = draw.textbbox((0,0), f'{flex_wins_lol}W/{flex_losses_lol}L', font=myFont)
+        draw.text((lolAccountFields["flexRatioField"][0]-r/2, lolAccountFields["flexRatioField"][1]-b/2), f'{flex_wins_lol}W/{flex_losses_lol}L', font=myFont, fill=('#c5c5c5'))
+        
+        _, _, r, b = draw.textbbox((0,0), f'{soloq_winrate[:5]}%', font=myFont)
+        draw.text((lolAccountFields["soloqWinrateField"][0]-r/2, lolAccountFields["soloqWinrateField"][1]-b/2), f'{soloq_winrate[:5]}%', font=myFont, fill=('#c5c5c5'))
+        _, _, r, b = draw.textbbox((0,0), f'{flex_winrate[:5]}%', font=myFont)
+        draw.text((lolAccountFields["flexWinrateField"][0]-r/2, lolAccountFields["flexWinrateField"][1]-b/2), f'{flex_winrate[:5]}%', font=myFont, fill=('#c5c5c5'))
+
+        template.save('assets/LolAccount.png')
+
+        # Send it
+        await ctx.channel.send(file=discord.File('assets/LolAccount.png'))
+
 
     @command(name='lolhisto')
     async def lolhisto(self, ctx, summoner_name, nb_game=5, type_queue="all"):
@@ -142,19 +231,6 @@ class LolAccount(Cog):
             await posted_message.add_reaction("😖")
 
     @staticmethod
-    async def sentence_maker(responsejson, i):
-        palier_lol = str(responsejson[i]["tier"])
-        division_lol = str(responsejson[i]["rank"])
-        league_point_lol = str(responsejson[i]["leaguePoints"])
-        wins_lol = responsejson[i]["wins"]
-        losses_lol = responsejson[i]["losses"]
-        nb_games = wins_lol + losses_lol
-        winrate_sentence = f" {str((wins_lol / (wins_lol + losses_lol)) * 100)[0:5]}% winrate"
-
-        return f"\n{palier_lol} {division_lol} {league_point_lol} lp\nA joué {nb_games} games, " \
-               f"{wins_lol} wins/{losses_lol} loses.{winrate_sentence}\n"
-
-    @staticmethod
     async def id_taker(summoner_name):
         url = str(f"https://euw1.api.riotgames.com/lol/summoner/v4/summoners/by-name/"
                   f"{summoner_name}?api_key={RIOT_KEY}")
@@ -187,3 +263,4 @@ class LolAccount(Cog):
 
 def setup(bot):
     bot.add_cog(LolAccount(bot))
+

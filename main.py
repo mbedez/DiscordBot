@@ -1,5 +1,5 @@
 import os
-from functions import Random,Delete,Help,Sondage,LolAccount,Shifumi
+from functions import Random,Delete,Help,Sondage,LolAccount,Shifumi, unMotParJour
 from abc import ABC
 
 from discord.ext.commands import Bot, MissingRequiredArgument, TooManyArguments
@@ -8,7 +8,7 @@ from dotenv import load_dotenv
 
 load_dotenv(dotenv_path="config")
 
-COGS = [Random, Delete, Help, Sondage, LolAccount, Shifumi]
+COGS = [Random, Delete, Help, Sondage, LolAccount, Shifumi, unMotParJour]
 
 
 class DocBot(Bot, ABC):
@@ -41,4 +41,4 @@ async def ping(message):
     await message.channel.send("pong")
 
 
-bot.run(os.getenv("TOKEN_TEST"))
+bot.run(os.getenv("TOKEN"))

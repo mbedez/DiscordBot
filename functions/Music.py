@@ -13,7 +13,6 @@ import math
 from urllib import request
 import youtube_dl as ytdl
 
-from . import stats
 
 YTDL_OPTS = {
     "default_search": "ytsearch",
@@ -205,7 +204,7 @@ class Music(commands.Cog):
         state = self.get_state(interaction.guild)
         return state.loop_flag
 
-    @message_command(name="Afficher la queue",guild_ids=[665676159421251587])
+    @message_command(name="Afficher la queue",guild_ids=[464811558048890880])
     async def queue(self, interaction, message):
         """Affiche la queue."""
         state = self.get_state(interaction.guild)
@@ -225,7 +224,7 @@ class Music(commands.Cog):
         else:
             return "La file est vide. Ajoute tes sons !"
 
-    @slash_command(guild_ids=[665676159421251587])
+    @slash_command(guild_ids=[464811558048890880])
     @commands.guild_only()
     async def play(self, ctx, *, url):
         """Joue l'audio de <url> (ou effectue une recherche de <url> et joue le premier résultat)."""
@@ -247,7 +246,6 @@ class Music(commands.Cog):
             state.playlist.append(video)
             await state.webhook.send(content=f"**{video.title}** à été ajouté à la queue")
             await state.webhook.send(embed=video.get_embed(),delete_after=5)
-            stats.stats_add_music_played(ctx.user)
         else:
             if ctx.author.voice is not None and ctx.author.voice.channel is not None:
                 await ctx.defer()
@@ -262,7 +260,6 @@ class Music(commands.Cog):
                 state.loop_flag=False #On reset le loop avant
                 state.player_message = await state.webhook.send(embed=video.get_embed(),view = MusicInteraction(self,video.video_url))
                 self._play_song(client, state, video)
-                stats.stats_add_music_played(ctx.user)
 
                 logging.info(f"Now playing '{video.title}'")
             else:

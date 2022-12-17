@@ -21,30 +21,28 @@ class LolAccount(Cog):
     @command(name='lolaccount')
     async def lol_account(self, ctx, summoner_name):
 
-        lolAccountFields = {'nameField': (1313, 730),
-                            'levelField': (2800,725),
-                            'soloqGamesField': (900,1600),
-                            'soloqRankField': (900,2130),
-                            'soloqPointsField': (900,2230),
-                            'soloqRatioField': (900,2760),
-                            'soloqWinrateField': (900,2880),
-                            'flexGamesField': (1768,1600),
-                            'flexRankField': (1768,2130),
-                            'flexPointsField': (1768,2230),
-                            'flexRatioField': (1768,2760),
-                            'flexWinrateField': (1768,2880),
-                            'aramGamesField': (2648,1600),
-                            'aramLastGameDayField': (2648,2130),
-                            'aramLastGameHourField': (2648,2230)}
+        lolAccountFields = {'nameField': (1057, 310),
+                            'levelField': (2544,324),
+                            'soloqGamesField': (644,1180),
+                            'soloqRankField': (644,1729),
+                            'soloqPointsField': (644,1829),
+                            'soloqRatioField': (644,2340),
+                            'soloqWinrateField': (644,2460),
+                            'flexGamesField': (1512,1180),
+                            'flexRankField': (1512,1729),
+                            'flexPointsField': (1512,1829),
+                            'flexRatioField': (1512,2340),
+                            'flexWinrateField': (1512,2480),
+                            'aramGamesField': (2392,1180),
+                            'aramLastGameDayField': (2392,1729),
+                            'aramLastGameHourField': (2392,1810)}
 
         # Open an image and editing it
         template = Image.open('assets/template.png')
         draw = ImageDraw.Draw(template)
 
-        summoner_name = str(summoner_name)
-
         # create an url to get info on summoner by summoner name
-        responsejson = await self.id_taker(summoner_name)
+        responsejson = await self.id_taker(str(summoner_name))
         lvl = str(responsejson["summonerLevel"])
         id_lol = str(responsejson["id"])
 

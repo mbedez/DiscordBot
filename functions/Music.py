@@ -6,11 +6,7 @@ from discord.ui import Button, View
 
 import asyncio
 from discord.utils import V
-import youtube_dl
-from typing import Optional
 import logging
-import math
-from urllib import request
 import youtube_dl as ytdl
 
 
@@ -24,7 +20,7 @@ YTDL_OPTS = {
 }
 
 # TODO: abstract FFMPEG options into their own file?
-FFMPEG_BEFORE_OPTS = '-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5'
+FFMPEG_BEFORE_OPTS = '-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 20'
 """
 Command line options to pass to `ffmpeg` before the `-i`.
 See https://stackoverflow.com/questions/43218292/youtubedl-read-error-with-discord-py/44490434#44490434 for more information.
@@ -173,8 +169,10 @@ class Music(commands.Cog):
         asyncio.run_coroutine_threadsafe(self.bot.change_presence(activity=_activity),self.bot.loop)
         channel = client.channel
         source = discord.FFmpegOpusAudio(song.stream_url, before_options=FFMPEG_BEFORE_OPTS)
+        print(f"Je lance {song.title}")
 
         def after_playing(err):
+            print(f"je considère avoir fini de jouer {song.title}")
             if state.loop_flag and (len(channel.members)>1):
                 next_song = state.now_playing
                 self._play_song(client, state, next_song)
@@ -204,7 +202,7 @@ class Music(commands.Cog):
         state = self.get_state(interaction.guild)
         return state.loop_flag
 
-    @message_command(name="Afficher la queue",guild_ids=[464811558048890880])
+    @message_command(name="Afficher la queue",guild_ids=[505198106350977024])
     async def queue(self, interaction, message):
         """Affiche la queue."""
         state = self.get_state(interaction.guild)
@@ -215,16 +213,16 @@ class Music(commands.Cog):
         queue = state.playlist
         if len(queue) > 0 or state.now_playing is not None:
             message = ['**Queue :**']
-            message +=[f'  [P] **{state.now_playing.title}** (Ajouté par **{state.now_playing.requested_by.name}**)']
+            message +=[f'  [P] **{state.now_playing.title}** (Ajoutée par **{state.now_playing.requested_by.name}**)']
             message += [
-                f"  [{index+1}] **{song.title}** (Ajouté par **{song.requested_by.name}**)"
+                f"  [{index+1}] **{song.title}** (Ajoutée par **{song.requested_by.name}**)"
                 for (index, song) in enumerate(queue)
             ]  # add individual songs
             return "\n".join(message)
         else:
             return "La file est vide. Ajoute tes sons !"
 
-    @slash_command(guild_ids=[464811558048890880])
+    @slash_command(guild_ids=[505198106350977024])
     @commands.guild_only()
     async def play(self, ctx, *, url):
         """Joue l'audio de <url> (ou effectue une recherche de <url> et joue le premier résultat)."""
@@ -232,19 +230,17 @@ class Music(commands.Cog):
         client = ctx.guild.voice_client
         state = self.get_state(ctx.guild)  # get the guild's state
 
-        
-
         if client and client.channel:
             await ctx.defer()
             state.webhook = ctx.followup
             try:
                 video = Video(url, ctx.author)
-            except youtube_dl.DownloadError as e:
+            except ytdl.DownloadError as e:
                 logging.warn(f"Error downloading video: {e}")
                 await state.webhook.send("Une erreur est survenue pendant le téléchargement de la musique.",ephemeral=True)
                 return
             state.playlist.append(video)
-            await state.webhook.send(content=f"**{video.title}** à été ajouté à la queue")
+            await state.webhook.send(content=f"**{video.title}** a été ajouté à la queue")
             await state.webhook.send(embed=video.get_embed(),delete_after=5)
         else:
             if ctx.author.voice is not None and ctx.author.voice.channel is not None:
@@ -253,7 +249,7 @@ class Music(commands.Cog):
                 channel = ctx.author.voice.channel
                 try:
                     video = Video(url, ctx.author)
-                except youtube_dl.DownloadError as e:
+                except ytdl.DownloadError as e:
                     await state.webhook.send("Une erreur est survenue pendant le téléchargement de la musique.",ephemeral=True)
                     return
                 client = await channel.connect()

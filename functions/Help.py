@@ -27,7 +27,11 @@ class Help(Cog):
                                
 
                                "**&shifumi** : "
-                               "Ajoute des réactions 🪨, 🧾 et ✂️ sur un message du bot\n\n")
+                               "Ajoute des réactions 🪨, 🧾 et ✂️ sur un message du bot\n\n"
+                               
+
+                               "**/play (url youtube ou recherche)** : "
+                               "Joue une musique sur le salon vocal de l'auteur de la commande\n\n")
 
 def setup(bot):
     bot.add_cog(Help(bot))

@@ -32,7 +32,7 @@ class LolAccount(Cog):
                             'flexRankField': (1512,1729),
                             'flexPointsField': (1512,1829),
                             'flexRatioField': (1512,2340),
-                            'flexWinrateField': (1512,2480),
+                            'flexWinrateField': (1512,2460),
                             'aramGamesField': (2392,1180),
                             'aramLastGameDayField': (2392,1729),
                             'aramLastGameHourField': (2392,1810)}

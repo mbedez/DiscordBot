@@ -1,5 +1,5 @@
 import os
-from functions import Random,Delete,Help,Sondage,LolAccount,Shifumi, unMotParJour
+from functions import Random,Delete,Help,Sondage,LolAccount,Shifumi, unMotParJour, Music
 from abc import ABC
 
 from discord.ext.commands import Bot, MissingRequiredArgument, TooManyArguments
@@ -8,7 +8,7 @@ from dotenv import load_dotenv
 
 load_dotenv(dotenv_path="config")
 
-COGS = [Random, Delete, Help, Sondage, LolAccount, Shifumi, unMotParJour]
+COGS = [Random, Delete, Help, Sondage, LolAccount, Shifumi, unMotParJour, Music]
 
 
 class DocBot(Bot, ABC):
@@ -31,7 +31,6 @@ class DocBot(Bot, ABC):
             await ctx.send("Il a trop de paramètres. (&help)")
         else:
             pass
-
 
 bot = DocBot()
 

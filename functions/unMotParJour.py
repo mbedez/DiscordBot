@@ -44,7 +44,7 @@ class unMotParJour(Cog):
                 word = soup.find("h1", {"class": "entry-title"}).get_text()
                 definition = soup.find("div", {"class": "entry-content"}).get_text()
 
-                data = {'content': f'```\n{word}\n\n {definition}```'}
+                data = {'content': f'```\n{word}\n {definition}```'}
                 
                 requests.post(f'https://discord.com/api/v6/channels/{channel_id}/messages', headers=headers, json=data)
 

@@ -202,7 +202,7 @@ class Music(commands.Cog):
         state = self.get_state(interaction.guild)
         return state.loop_flag
 
-    @message_command(name="Afficher la queue",guild_ids=[505198106350977024])
+    @message_command(name="Afficher la queue",guild_ids=[505198106350977024,464811558048890880])
     async def queue(self, interaction, message):
         """Affiche la queue."""
         state = self.get_state(interaction.guild)

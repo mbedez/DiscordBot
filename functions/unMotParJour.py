@@ -1,5 +1,4 @@
 from discord.ext.commands import Cog
-from discord.ext.commands import command
 
 from bs4 import BeautifulSoup
 import urllib.parse
@@ -50,7 +49,6 @@ class unMotParJour(Cog):
 
             time.sleep(60)
         
-
 
 def setup(bot):
 	bot.add_cog(unMotParJour(bot))

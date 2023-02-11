@@ -58,7 +58,7 @@ class LolAccount(Cog):
         soloq_palier_lol = soloq_division_lol = flex_palier_lol= flex_division_lol = ' '
         soloq_league_point_lol = flex_league_point_lol = soloq_nb_of_games = flex_nb_of_games= '0'
         soloq_losses_lol = soloq_wins_lol = flex_wins_lol = flex_losses_lol = '0'
-        soloq_winrate = flex_winrate = '    0'
+        soloq_winrate = flex_winrate = 4*' '+'0'
 
         # if ranked in soloq or flex
         for i in range(nb_of_ranks):
@@ -89,7 +89,7 @@ class LolAccount(Cog):
         responsejson = requests.get(url).json()
         all_aram = len(responsejson)
 
-        last_aram= last_aram_date = '      '        
+        last_aram= last_aram_date = 6*' '        
 
         last_aram_date = ""
         if len(responsejson) != 0:
@@ -261,4 +261,3 @@ class LolAccount(Cog):
 
 def setup(bot):
     bot.add_cog(LolAccount(bot))
-

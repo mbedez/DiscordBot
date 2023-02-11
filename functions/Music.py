@@ -19,13 +19,7 @@ YTDL_OPTS = {
     "no_playlist": True
 }
 
-# TODO: abstract FFMPEG options into their own file?
 FFMPEG_BEFORE_OPTS = '-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 20'
-"""
-Command line options to pass to `ffmpeg` before the `-i`.
-See https://stackoverflow.com/questions/43218292/youtubedl-read-error-with-discord-py/44490434#44490434 for more information.
-Also, https://ffmpeg.org/ffmpeg-protocols.html for command line option reference.
-"""
 
 
 async def audio_playing(ctx):

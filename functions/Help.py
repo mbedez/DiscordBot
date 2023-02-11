@@ -8,7 +8,8 @@ class Help(Cog):
 
     @command(name='help')
     async def helping(self, ctx):
-        await ctx.channel.send("**&random n** : génère un nombre entre 1 et **n**\n"
+        await ctx.channel.send("**&random n** : "
+                               "génère un nombre entre 1 et **n**\n"
 
                                "**&dice (Optionnel : n)** : "
                                "génère un nombre entre 1 et 6 ( ou entre 1 et **n** avec n inférieur ou égal à 6)\n\n"
@@ -31,7 +32,7 @@ class Help(Cog):
                                
 
                                "**/play (url youtube ou recherche)** : "
-                               "Joue une musique sur le salon vocal de l'auteur de la commande\n\n")
+                               "Joue une musique sur le salon vocal actuel\n\n")
 
 def setup(bot):
     bot.add_cog(Help(bot))

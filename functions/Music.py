@@ -216,7 +216,7 @@ class Music(commands.Cog):
         else:
             return "La file est vide. Ajoute tes sons !"
 
-    @slash_command(guild_ids=[505198106350977024])
+    @slash_command(guild_ids=[505198106350977024,464811558048890880])
     @commands.guild_only()
     async def play(self, ctx, *, url):
         """Joue l'audio de <url> (ou effectue une recherche de <url> et joue le premier résultat)."""

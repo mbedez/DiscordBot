@@ -7,10 +7,9 @@ from discord.ui import Button, View
 import asyncio
 from discord.utils import V
 import logging
-import yt_dlp
+import youtube_dl as ytdl
 
-
-yt_dlp_OPTS = {
+YTDL_OPTS = {
     "default_search": "ytsearch",
     "format": "m4a/bestaudio/best",
     "audio-quality": "128K",
@@ -49,32 +48,19 @@ class Video:
 
     def __init__(self, url_or_search, requested_by):
         """Plays audio from (or searches for) a URL."""
-        with yt_dlp.YoutubeDL(yt_dlp_OPTS) as ydl:
-            video = self._get_info(url_or_search)
+        with ytdl.YoutubeDL(YTDL_OPTS) as ydl:
+            video = ydl.extract_info(url_or_search, download=False)
             video_format = video["formats"][0]
             self.stream_url = video_format["url"]
             self.video_url = video["webpage_url"]
             self.title = video["title"]
-            self.uploader = video["uploader"] if "uploader" in video else ""
-            self.thumbnail = video[
-                "thumbnail"] if "thumbnail" in video else None
+            self.thumbnail = video["thumbnail"] if "thumbnail" in video else None
             self.requested_by = requested_by
-
-    def _get_info(self, video_url):
-        with yt_dlp.YoutubeDL(yt_dlp_OPTS) as ydl:
-            info = ydl.extract_info(video_url, download=False)
-            video = None
-            if "_type" in info and info["_type"] == "playlist":
-                return self._get_info(
-                    info["entries"][0]["url"])  # get info for first video
-            else:
-                video = info
-            return video
 
     def get_embed(self):
         """Makes an embed out of this Video's information."""
         embed = discord.Embed(
-            title=self.title, description=self.uploader, url=self.video_url)
+            title=self.title, description="", url=self.video_url)
         embed.set_footer(
             text=f"Ajouté par {self.requested_by.name}",
             icon_url=self.requested_by.avatar)
@@ -149,6 +135,7 @@ class Music(commands.Cog):
             await client.disconnect()
             state.playlist = []
             state.now_playing = None
+            asyncio.run_coroutine_threadsafe(self.bot.change_presence(activity=None),self.bot.loop)
         else:
             raise commands.CommandError("Pas dans un salon vocal.")
 
@@ -169,18 +156,22 @@ class Music(commands.Cog):
         source = discord.FFmpegOpusAudio(song.stream_url, before_options=FFMPEG_BEFORE_OPTS)
         print(f"Je lance {song.title}")
 
-        def after_playing(err):
-            print(f"je considère avoir fini de jouer {song.title}")
+        def after_playing(err):            
             if state.loop_flag and (len(channel.members)>1):
                 next_song = state.now_playing
                 self._play_song(client, state, next_song)
-            elif (len(state.playlist) > 0) and (len(channel.members)>1) :
-                next_song = state.playlist.pop(0)
+
+            elif (len(state.playlist) > 1) and (len(channel.members)>1) :
+                state.playlist.pop(0)
+                next_song = Video(state.playlist[0][0], state.playlist[0][2])
                 if state.player_message is not None:
                     asyncio.run_coroutine_threadsafe(state.player_message.edit(view=None),self.bot.loop)
                 self._play_song(client, state, next_song)
                 asyncio.run_coroutine_threadsafe(self.send_player(next_song,state),self.bot.loop)
+                
             else:
+                while len(state.playlist) > 1 :
+                    state.playlist.pop(0)
                 asyncio.run_coroutine_threadsafe(state.player_message.edit(view=None),self.bot.loop)
                 state.now_playing = None
                 asyncio.run_coroutine_threadsafe(client.disconnect(),self.bot.loop)
@@ -204,18 +195,16 @@ class Music(commands.Cog):
     async def queue(self, interaction, message):
         """Affiche la queue."""
         state = self.get_state(interaction.guild)
-        await interaction.response.send_message(self._queue_text(state),ephemeral=True)
+        await interaction.response.send_message(self._queue_text(state)[:2000],ephemeral=True)
 
     def _queue_text(self, state):
         """Retourne le texte pour l'affichage de la queue."""
         queue = state.playlist
         if len(queue) > 0 or state.now_playing is not None:
             message = ['**Queue :**']
-            message +=[f'  [P] **{state.now_playing.title}** (Ajoutée par **{state.now_playing.requested_by.name}**)']
-            message += [
-                f"  [{index+1}] **{song.title}** (Ajoutée par **{song.requested_by.name}**)"
-                for (index, song) in enumerate(queue)
-            ]  # add individual songs
+            message +=[f'  [P] **{state.playlist[0][1]}** (Ajoutée par **{str(state.playlist[0][2])[:-5]}**)']
+            for i in range (len(state.playlist)-1):
+                message += [f"  [{i+1}] **{state.playlist[i+1][1]}** (Ajoutée par **{str(state.playlist[i+1][2])[:-5]}**)"]  # add individual songs
             return "\n".join(message)
         else:
             return "La file est vide. Ajoute tes sons !"
@@ -232,30 +221,56 @@ class Music(commands.Cog):
             await ctx.defer()
             state.webhook = ctx.followup
             try:
-                video = Video(url, ctx.author)
-            except yt_dlp.DownloadError as e:
+                videoList = []
+                with ytdl.YoutubeDL(YTDL_OPTS) as ydl:
+                    video = ydl.extract_info(url, download=False)
+                    if "_type" in video and video["_type"] == "playlist":
+                        for i in range(len(video["entries"])):
+                            videoList.append([video["entries"][i]["url"], video["entries"][i]["title"], ctx.author])
+                    else :
+                        videoList.append([url, video["title"], ctx.author])
+
+            except ytdl.DownloadError as e:
                 logging.warn(f"Error downloading video: {e}")
                 await state.webhook.send("Une erreur est survenue pendant le téléchargement de la musique.",ephemeral=True)
                 return
-            state.playlist.append(video)
-            await state.webhook.send(content=f"**{video.title}** a été ajouté à la queue")
-            await state.webhook.send(embed=video.get_embed(),delete_after=5)
+
+            for video in videoList :
+                state.playlist.append([video[0], video[1], video[2]])
+            await ctx.respond("Musique(s) ajoutée(s)")
+
         else:
             if ctx.author.voice is not None and ctx.author.voice.channel is not None:
                 await ctx.defer()
                 state.webhook = ctx.followup
                 channel = ctx.author.voice.channel
                 try:
-                    video = Video(url, ctx.author)
-                except yt_dlp.DownloadError as e:
+                    videoList = []
+                    with ytdl.YoutubeDL(YTDL_OPTS) as ydl:
+                        video = ydl.extract_info(url, download=False)
+                        if "_type" in video and video["_type"] == "playlist":
+                            for i in range(len(video["entries"])):
+                                videoList.append([video["entries"][i]["url"], video["entries"][i]["title"], ctx.author])
+                        else :
+                            videoList.append([url, video["title"], ctx.author])
+
+                except ytdl.DownloadError as e:
                     await state.webhook.send("Une erreur est survenue pendant le téléchargement de la musique.",ephemeral=True)
                     return
+
+                print("Je me connecte au vocal")
+
                 client = await channel.connect()
                 state.loop_flag=False #On reset le loop avant
-                state.player_message = await state.webhook.send(embed=video.get_embed(),view = MusicInteraction(self,video.video_url))
-                self._play_song(client, state, video)
 
-                logging.info(f"Now playing '{video.title}'")
+                for video in videoList :
+                    state.playlist.append([video[0],video[1], video[2]])
+                
+                if ctx.author.voice is not None and ctx.author.voice.channel is not None:
+                    currentSong = Video(state.playlist[0][0], state.playlist[0][2])
+                    state.player_message = await state.webhook.send(embed=currentSong.get_embed(),view = MusicInteraction(self,currentSong.video_url))
+                    self._play_song(client, state, currentSong)
+                    
             else:
                 await ctx.response.send_message("Tu dois être dans un salon vocal pour faire ça.",ephemeral=True)
                 raise commands.CommandError("Tu dois être dans un salon vocal pour faire ça.")

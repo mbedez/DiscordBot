@@ -10,6 +10,7 @@ RUN apt update
 RUN apt install -y ffmpeg
 
 RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install git+https://github.com/ytdl-org/youtube-dl.git@master#egg=youtube_dl --force-reinstall
 
 COPY . .
 

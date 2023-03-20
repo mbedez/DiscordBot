@@ -1,7 +1,7 @@
 py-cord
 python-dotenv
 requests
-yt-dlp
+youtube_dl
 PyNaCl
 Pillow
 bs4

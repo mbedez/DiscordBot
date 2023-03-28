@@ -6,7 +6,7 @@ class Delete(Cog):
         self.bot = bot
 
     # unreferenced command without security that can delete n message
-    @command(name='deI')
+    @command(name='supp')
     async def deI(self, ctx, number_of_messages: int):
         messages = await ctx.channel.history(limit=number_of_messages + 1).flatten()
 

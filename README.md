@@ -13,7 +13,7 @@ Here's a list of different things you could do with this bot:
   If you provided an int, the returned number will be between 1 and the int. It must be less or equal to 6.
 - **&poll** => Add positive and negative reactions to the previous message.
 - **&shifumi** => Add stone, paper and scissors reactions to the previous message.
-- **&deI** *int* => Delete the last *int* messages.
+- **&supp** *int* => Delete the last *int* messages.
 - **&lolaccount** *summoner_name* => give you the level, all his ranks, the number of aram and the date of his last aram of the summoner.
 - **&lolhisto** *summoner_name* ( Optional : *nb_of_game (<=30)* *queue (soloq or flex)*) => give you the last nb_of_game of the summoner with the result (win or lose, kda) and the played champion.
 - **/play** *youtube url or research* => Play the audio on your current audio channel.

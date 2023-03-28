@@ -170,7 +170,7 @@ class Music(commands.Cog):
                 asyncio.run_coroutine_threadsafe(self.send_player(next_song,state),self.bot.loop)
                 
             else:
-                while len(state.playlist) > 1 :
+                while len(state.playlist) >= 1 :
                     state.playlist.pop(0)
                 asyncio.run_coroutine_threadsafe(state.player_message.edit(view=None),self.bot.loop)
                 state.now_playing = None
@@ -259,7 +259,7 @@ class Music(commands.Cog):
                     return
 
                 print("Je me connecte au vocal")
-
+                
                 client = await channel.connect()
                 state.loop_flag=False #On reset le loop avant
 
@@ -290,6 +290,3 @@ class GuildState:
         self.webhook = None
         self.player_message = None
         self.loop_flag = False
-
-    def is_requester(self, user):
-        return self.now_playing.requested_by == user

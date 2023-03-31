@@ -8,7 +8,7 @@ from dotenv import load_dotenv
 
 load_dotenv(dotenv_path="config")
 
-COGS = [Random, Delete, Help, Sondage, LolAccount, Shifumi, unMotParJour, Music]
+COGS = [Random, Delete, Help, Poll, LolAccount, Shifumi, OneWordEachDay, Music]
 
 
 class DocBot(Bot, ABC):

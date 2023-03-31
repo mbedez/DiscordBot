@@ -7,47 +7,30 @@ import urllib.request
 import requests
 import os
 
-import threading
-import datetime
-import time
+from apscheduler.triggers.cron import CronTrigger
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
+
 
 class unMotParJour(Cog):
     def __init__(self, bot):
         self.bot = bot
-        self.started = False
-        print("init")
+        self.channel_id = os.getenv("CHANNEL_MOTS")
+        self.url = "http://unmotparjour.fr/random/"
+        self.headers = {'Authorization': f'Bot {os.getenv("TOKEN")}'}
+        self.scheduler = AsyncIOScheduler(timezone="Europe/Paris")
+        self._add_job = self.scheduler.add_job(self.getMot, CronTrigger(hour=20,minute=0,second=0))
+        self.scheduler.start()
 
-        if not self.started:
-            t = threading.Thread(target=self.randomUnMotParJour)
-            t.start()
-            self.started = True     
+    def getMot(self):
+        html_content = urllib.request.urlopen(urllib.request.urlopen(self.url).url).read()
+        soup = BeautifulSoup(html_content, 'html.parser')
 
-    def randomUnMotParJour(self):
-        print("function")
-        # headers for discord api
-        headers = {'Authorization': f'Bot {os.getenv("TOKEN")}'}
+        word = soup.find("h1", {"class": "entry-title"}).get_text()
+        definition = soup.find("div", {"class": "entry-content"}).get_text()
 
-        # channel i want send message
-        channel_id = '1055154215820984391'
-
-        while True:
-            current_time = datetime.datetime.now()
-            
-            if current_time.hour == 19 and current_time.minute == 0:  # execute at 20:00 (UTC+1)
-
-                url = "http://unmotparjour.fr/random/"
-
-                html_content = urllib.request.urlopen(urllib.request.urlopen(url).url).read()
-                soup = BeautifulSoup(html_content, 'html.parser')
-
-                word = soup.find("h1", {"class": "entry-title"}).get_text()
-                definition = soup.find("div", {"class": "entry-content"}).get_text()
-
-                data = {'content': f'```\n{word}\n {definition}```'}
-                
-                requests.post(f'https://discord.com/api/v6/channels/{channel_id}/messages', headers=headers, json=data)
-
-            time.sleep(60)
+        data = {'content': f'```\n{word}\n {definition}```'}
+        
+        requests.post(f'https://discord.com/api/v6/channels/{self.channel_id}/messages', headers=self.headers, json=data)
         
 
 def setup(bot):

@@ -20,5 +20,4 @@ RUN apk add zlib-dev \
  && apk del build-base \
  && apk del git
 
-
-CMD ["python3.8", "main.py"]
+CMD ["python3.11", "main.py"]

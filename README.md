@@ -16,23 +16,27 @@ Here's a list of different things you could do with this bot:
 - **&supp** *int* => Delete the last *int* messages.
 - **&lolaccount** *summoner_name* => give you the level, all his ranks, the number of aram and the date of his last aram of the summoner.
 - **&lolhisto** *summoner_name* ( Optional : *nb_of_game (<=30)* *queue (soloq or flex)*) => give you the last nb_of_game of the summoner with the result (win or lose, kda) and the played champion.
-- **/play** *youtube url or research* => Play the audio on your current audio channel.
+- **/play** *youtube url or research* => Play the audio on your current audio channel. (Can also play playlist)
+
+- The Bot also send a random definition of a french word every day on a specific channel you set for.
 ***
 ## What do you need in order to set FafBot up?
 FafBot runs in python with the help of the **pycord** package. In order to run the bot, you will need a few things :
 - python3 (*of course*)
 - ffmpeg
-- pycord : A library used to communicate between python and discord API, fork of discord.py
-- dotenv : A library used to secure your **config file**
+- py-cord : A library used to communicate between python and discord API, fork of discord.py
+- python-dotenv : A library used to secure your **config file**
 - requests : A library used to make https requests
-- youtube-dl : A library used to dl the audio of a youtube video
-- PyNaCl library
-- Pillow : A library used edit an image
+- youtube_dl : A library used to dl the audio of a youtube video
+- PyNaCl : A library to play audio
+- Pillow : A library used to edit an image
 - bs4 : A library used to parse html
+- apscheduler : A library used to schedule a task
 - a *config* file containing your **discord Token** and your **Riot API Key**
 
 
-You can use `pip install -r requirements.txt` to install the necessary libraries.
+You can use the Dockerfile to buid an Alpine Docker image for Raspberry pi 4 with `docker build -t your/tag .`.
+You can also use `pip install -r requirements.txt` to install the necessary libraries.
 
 ***
 ## What is the future of FafBot

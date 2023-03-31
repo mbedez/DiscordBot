@@ -5,9 +5,10 @@ from discord.commands import slash_command,message_command
 from discord.ui import Button, View
 
 import asyncio
-from discord.utils import V
 import logging
 import youtube_dl as ytdl
+
+import os
 
 YTDL_OPTS = {
     "default_search": "ytsearch",
@@ -191,7 +192,7 @@ class Music(commands.Cog):
         state = self.get_state(interaction.guild)
         return state.loop_flag
 
-    @message_command(name="Afficher la queue",guild_ids=[505198106350977024,464811558048890880])
+    @message_command(name="Afficher la queue",guild_ids=[int(os.getenv("SERVEUR_NST")),int(os.getenv("SERVEUR_FC"))])
     async def queue(self, interaction, message):
         """Affiche la queue."""
         state = self.get_state(interaction.guild)
@@ -209,7 +210,7 @@ class Music(commands.Cog):
         else:
             return "La file est vide. Ajoute tes sons !"
 
-    @slash_command(guild_ids=[505198106350977024,464811558048890880])
+    @slash_command(guild_ids=[int(os.getenv("SERVEUR_NST")),int(os.getenv("SERVEUR_FC"))])
     @commands.guild_only()
     async def play(self, ctx, *, url):
         """Joue l'audio de <url> (ou effectue une recherche de <url> et joue le premier résultat)."""

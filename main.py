@@ -1,5 +1,5 @@
 import os
-from functions import Random,Delete,Help,Sondage,LolAccount,Shifumi, unMotParJour, Music
+from functions import Random,Delete,Help,Poll,LolAccount,Shifumi,OneWordEachDay,Music
 from abc import ABC
 
 from discord.ext.commands import Bot, MissingRequiredArgument, TooManyArguments

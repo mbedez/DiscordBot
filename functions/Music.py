@@ -76,43 +76,62 @@ class MusicInteraction(View):
         self.playing = True
         self.video_url = url
         self.add_item(Button(label="Voir sur Youtube",url=url,row=1))
+        self.errorMessage = "Tu dois être dans le même salon vocal que le bot pour ça"
 
     @discord.ui.button(label="Pause", style=discord.ButtonStyle.grey)
     async def pause_button_callback(self,button,interaction):
-        if self.playing:
-            button.label = "Play"
-            button.style = discord.ButtonStyle.primary
-        else:
-            button.label = "Pause"
-            button.style = discord.ButtonStyle.grey
-        self.playing = not self.playing
-        await interaction.response.edit_message(view=self)
-        self.player._pause_audio(interaction.guild.voice_client)
+        client = interaction.guild.voice_client
+        if interaction.user.voice:
+            if interaction.user.voice.channel.id==client.channel.id:
+                if self.playing:
+                    button.label = "Play"
+                    button.style = discord.ButtonStyle.primary
+                else:
+                    button.label = "Pause"
+                    button.style = discord.ButtonStyle.grey
+                self.playing = not self.playing
+                await interaction.response.edit_message(view=self)
+                self.player._pause_audio(interaction.guild.voice_client)
+            else: await interaction.response.send_message(self.errorMessage,ephemeral=True)
+        else: await interaction.response.send_message(self.errorMessage,ephemeral=True)
 
     @discord.ui.button(label="Skip", style=discord.ButtonStyle.grey)
     async def skip_button_callback(self,button,interaction):
-        if await audio_playing(interaction) and await in_voice_channel(interaction):
-            await self.player._skip(interaction)
-        else:
-            if not await audio_playing(interaction):
-                await interaction.response.send_message("Il n'y a pas de musique en cours.",ephemeral=True)
-            elif not in_voice_channel(interaction):
-                await interaction.response.send_message("Tu doit être dans le salon avec le bot.",ephemeral=True)
+        client = interaction.guild.voice_client
+        if interaction.user.voice:
+            if interaction.user.voice.channel.id==client.channel.id:
+                if await audio_playing(interaction) and await in_voice_channel(interaction):
+                    await self.player._skip(interaction)
+                elif not await audio_playing(interaction):
+                    await interaction.response.send_message("Il n'y a pas de musique en cours.",ephemeral=True)
+            else: await interaction.response.send_message(self.errorMessage,ephemeral=True)
+        else: await interaction.response.send_message(self.errorMessage,ephemeral=True)
 
     @discord.ui.button(label="Loop", style=discord.ButtonStyle.grey)
     async def loop_button_callback(self,button,interaction):
-        if await self.player._loop(interaction):
-            if await self.player.get_loop_status(interaction):
-                button.style=discord.ButtonStyle.success
-            else:
-                button.style=discord.ButtonStyle.grey
-            await interaction.response.edit_message(view=self)
-        else:
-            await interaction.response.send_message("Il n'y a pas de musique en cours.")
+        client = interaction.guild.voice_client
+        if interaction.user.voice:
+            if interaction.user.voice.channel.id==client.channel.id:
+                if await self.player._loop(interaction):
+                    if await self.player.get_loop_status(interaction):
+                        button.style=discord.ButtonStyle.success
+                    else:
+                        button.style=discord.ButtonStyle.grey
+                    await interaction.response.edit_message(view=self)
+                else:
+                    await interaction.response.send_message("Il n'y a pas de musique en cours.")
+            else: await interaction.response.send_message(self.errorMessage,ephemeral=True)
+        else: await interaction.response.send_message(self.errorMessage,ephemeral=True)
 
     @discord.ui.button(label="Stop", style=discord.ButtonStyle.danger)
     async def stop_button_callback(self,button,interaction):
-        await self.player._stop(interaction)
+        client = interaction.guild.voice_client
+        if interaction.user.voice:
+            if interaction.user.voice.channel.id==client.channel.id:
+                await self.player._stop(interaction, client)
+            else: await interaction.response.send_message(self.errorMessage,ephemeral=True)
+        else: await interaction.response.send_message(self.errorMessage,ephemeral=True)
+    
 
 class Music(commands.Cog):
 
@@ -128,17 +147,13 @@ class Music(commands.Cog):
             self.states[guild.id] = GuildState()
             return self.states[guild.id]
 
-    async def _stop(self, interaction):
+    async def _stop(self, interaction, client):
         """Quitte le salon vocal."""
-        client = interaction.guild.voice_client
         state = self.get_state(interaction.guild)
-        if client and client.channel:
-            await client.disconnect()
-            state.playlist = []
-            state.now_playing = None
-            asyncio.run_coroutine_threadsafe(self.bot.change_presence(activity=None),self.bot.loop)
-        else:
-            raise commands.CommandError("Pas dans un salon vocal.")
+        await client.disconnect()
+        state.playlist = []
+        state.now_playing = None
+        asyncio.run_coroutine_threadsafe(self.bot.change_presence(activity=None),self.bot.loop)
 
     def _pause_audio(self, client):
         if client.is_paused():
@@ -208,7 +223,7 @@ class Music(commands.Cog):
                 message += [f"  [{i+1}] **{state.playlist[i+1][1]}** (Ajoutée par **{str(state.playlist[i+1][2])[:-5]}**)"]  # add individual songs
             return "\n".join(message)
         else:
-            return "La file est vide. Ajoute tes sons !"
+            return "La file est vide !"
 
     @slash_command(guild_ids=[int(os.getenv("SERVEUR_NST")),int(os.getenv("SERVEUR_FC"))])
     @commands.guild_only()
@@ -219,26 +234,30 @@ class Music(commands.Cog):
         state = self.get_state(ctx.guild)  # get the guild's state
 
         if client and client.channel:
-            await ctx.defer()
-            state.webhook = ctx.followup
-            try:
-                videoList = []
-                with ytdl.YoutubeDL(YTDL_OPTS) as ydl:
-                    video = ydl.extract_info(url, download=False)
-                    if "_type" in video and video["_type"] == "playlist":
-                        for i in range(len(video["entries"])):
-                            videoList.append([video["entries"][i]["url"], video["entries"][i]["title"], ctx.author])
-                    else :
-                        videoList.append([url, video["title"], ctx.author])
+            if ctx.author.voice:
+                if ctx.author.voice.channel.id==client.channel.id:
+                    await ctx.defer()
+                    state.webhook = ctx.followup
+                    try:
+                        videoList = []
+                        with ytdl.YoutubeDL(YTDL_OPTS) as ydl:
+                            video = ydl.extract_info(url, download=False)
+                            if "_type" in video and video["_type"] == "playlist":
+                                for i in range(len(video["entries"])):
+                                    videoList.append([video["entries"][i]["url"], video["entries"][i]["title"], ctx.author])
+                            else :
+                                videoList.append([url, video["title"], ctx.author])
 
-            except ytdl.DownloadError as e:
-                logging.warn(f"Error downloading video: {e}")
-                await state.webhook.send("Une erreur est survenue pendant le téléchargement de la musique.",ephemeral=True)
-                return
+                    except ytdl.DownloadError as e:
+                        logging.warn(f"Error downloading video: {e}")
+                        await state.webhook.send("Une erreur est survenue pendant le téléchargement de la musique.",ephemeral=True)
+                        return
 
-            for video in videoList :
-                state.playlist.append([video[0], video[1], video[2]])
-            await ctx.respond("Musique(s) ajoutée(s)")
+                    for video in videoList :
+                        state.playlist.append([video[0], video[1], video[2]])
+                    await ctx.respond("Musique(s) ajoutée(s)")
+                else: await ctx.response.send_message("Le bot est déjà dans un autre channel",ephemeral=True)
+            else: await ctx.response.send_message("Le bot est déjà dans un autre channel",ephemeral=True)
 
         else:
             if ctx.author.voice is not None and ctx.author.voice.channel is not None:

@@ -40,4 +40,4 @@ You can also use `pip install -r requirements.txt` to install the necessary libr
 
 ***
 ## What is the future of FafBot
-Nothing else than corrections.
+Nothing else than corrections and improvements.

@@ -1,4 +1,4 @@
-FROM arm32v7/python:3.11.2-alpine
+FROM python:3.11.2-alpine
 
 ENV PYTHONUNBUFFERED=1
 
@@ -6,18 +6,21 @@ WORKDIR /app
 
 COPY . .
 
-RUN apk add zlib-dev \
- && apk add jpeg-dev \
- && apk add build-base \
- && apk add ffmpeg-libs \
- && apk add ffmpeg \
- && apk add git \
- && apk add libffi-dev \
+RUN apk add --no-cache zlib-dev \
+ && apk add --no-cache jpeg-dev \
+ && apk add --no-cache build-base \
+ && apk add --no-cache ffmpeg-libs \
+ && apk add --no-cache ffmpeg \
+ && apk add --no-cache git \
+ && apk add --no-cache libffi-dev \
+ && apk add --no-cache tzdata \
  && pip install --no-cache-dir -r requirements.txt \
  && pip install git+https://github.com/ytdl-org/youtube-dl.git@master#egg=youtube_dl --force-reinstall \
  && apk del zlib-dev \
  && apk del jpeg-dev \
  && apk del build-base \
  && apk del git
+
+ENV TZ=Europe/Paris
 
 CMD ["python3.11", "main.py"]

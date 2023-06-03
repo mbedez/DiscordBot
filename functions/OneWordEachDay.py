@@ -26,7 +26,7 @@ class unMotParJour(Cog):
         soup = BeautifulSoup(html_content, 'html.parser')
 
         word = soup.find("h1", {"class": "entry-title"}).get_text()
-        definition = self.process_text(word + soup.find("div", {"class": "entry-content"}).get_text())
+        definition = self.process_text(word + '\n' + soup.find("div", {"class": "entry-content"}).get_text())
 
         data = {'content': f'```\n{definition}```'}
         

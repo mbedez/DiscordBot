@@ -27,7 +27,7 @@ FafBot runs in python with the help of the **pycord** package. In order to run t
 - py-cord : A library used to communicate between python and discord API, fork of discord.py
 - python-dotenv : A library used to secure your **config file**
 - requests : A library used to make https requests
-- youtube_dl : A library used to dl the audio of a youtube video
+- youtube-dl : A library used to dl the audio of a youtube video
 - PyNaCl : A library to play audio
 - Pillow : A library used to edit an image
 - bs4 : A library used to parse html
@@ -36,7 +36,7 @@ FafBot runs in python with the help of the **pycord** package. In order to run t
 
 
 You can use the Dockerfile to buid an Alpine Docker image for Raspberry pi 4 with `docker build -t your/tag .`.
-You can also use `pip install -r requirements.txt` to install the necessary libraries.
+You can also use `pip install -r requirements.txt` to install the necessary libraries. (youtube-dl needs to be installed from github version with pip `install git+https://github.com/ytdl-org/youtube-dl.git@master`)
 
 ***
 ## What is the future of FafBot

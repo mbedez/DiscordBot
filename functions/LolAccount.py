@@ -17,11 +17,7 @@ RIOT_KEY = (os.getenv("RIOT_KEY"))
 class LolAccount(Cog):
     def __init__(self, bot):
         self.bot = bot
-
-    @command(name='lolaccount')
-    async def lol_account(self, ctx, summoner_name):
-
-        lolAccountFields = {'nameField': (1057, 310),
+        self.lolAccountFields = {'nameField': (1057, 310),
                             'levelField': (2544,324),
                             'soloqGamesField': (644,1180),
                             'soloqRankField': (644,1729),
@@ -37,6 +33,11 @@ class LolAccount(Cog):
                             'aramLastGameDayField': (2392,1729),
                             'aramLastGameHourField': (2392,1810)}
 
+    @command(name='lolaccount')
+    async def lol_account(self, ctx, summoner_name):
+
+        print(f"lolaccount command used by {ctx.author.name} in {ctx.guild.name}")
+
         # Open an image and editing it
         template = Image.open('assets/template.png')
         draw = ImageDraw.Draw(template)
@@ -45,9 +46,6 @@ class LolAccount(Cog):
         responsejson = await self.id_taker(str(summoner_name))
         lvl = str(responsejson["summonerLevel"])
         id_lol = str(responsejson["id"])
-
-        soloq_sentence = f"\nPas classé !\n"
-        flex_sentence = f"\nPas classé !\n"
 
         # create an url to get info on summoner ranks by summoner id
         url = f"https://euw1.api.riotgames.com/lol/league/v4/entries/by-summoner/{id_lol}?api_key={RIOT_KEY}"
@@ -111,46 +109,46 @@ class LolAccount(Cog):
         myFont = ImageFont.truetype('./fonts/lolAccountFont.ttf', 250)
 
         _, _, r, b = draw.textbbox((0,0), summoner_name, font=myFont)
-        draw.text((lolAccountFields["nameField"][0]-r/2, lolAccountFields["nameField"][1]-b/2), summoner_name, font=myFont, fill=('#c5c5c5'))
+        draw.text((self.lolAccountFields["nameField"][0]-r/2, self.lolAccountFields["nameField"][1]-b/2), summoner_name, font=myFont, fill=('#c5c5c5'))
         _, _, r, b = draw.textbbox((0,0), lvl, font=myFont)
-        draw.text((lolAccountFields["levelField"][0]-r/2, lolAccountFields["levelField"][1]-b/2), lvl, font=myFont, fill=('#c5c5c5'))
+        draw.text((self.lolAccountFields["levelField"][0]-r/2, self.lolAccountFields["levelField"][1]-b/2), lvl, font=myFont, fill=('#c5c5c5'))
 
 
         myFont = ImageFont.truetype('./fonts/lolAccountFont.ttf', 200)
 
         _, _, r, b = draw.textbbox((0,0), str(soloq_nb_of_games), font=myFont)
-        draw.text((lolAccountFields["soloqGamesField"][0]-r/2, lolAccountFields["soloqGamesField"][1]-b/2), str(soloq_nb_of_games), font=myFont, fill=('#c5c5c5'))
+        draw.text((self.lolAccountFields["soloqGamesField"][0]-r/2, self.lolAccountFields["soloqGamesField"][1]-b/2), str(soloq_nb_of_games), font=myFont, fill=('#c5c5c5'))
         _, _, r, b = draw.textbbox((0,0), str(flex_nb_of_games), font=myFont)
-        draw.text((lolAccountFields["flexGamesField"][0]-r/2, lolAccountFields["flexGamesField"][1]-b/2), str(flex_nb_of_games), font=myFont, fill=('#c5c5c5'))
+        draw.text((self.lolAccountFields["flexGamesField"][0]-r/2, self.lolAccountFields["flexGamesField"][1]-b/2), str(flex_nb_of_games), font=myFont, fill=('#c5c5c5'))
         _, _, r, b = draw.textbbox((0,0), str(all_aram), font=myFont)
-        draw.text((lolAccountFields["aramGamesField"][0]-r/2, lolAccountFields["aramGamesField"][1]-b/2), str(all_aram), font=myFont, fill=('#c5c5c5'))
+        draw.text((self.lolAccountFields["aramGamesField"][0]-r/2, self.lolAccountFields["aramGamesField"][1]-b/2), str(all_aram), font=myFont, fill=('#c5c5c5'))
 
 
         myFont = ImageFont.truetype('./fonts/lolAccountFont.ttf', 100)
 
         _, _, r, b = draw.textbbox((0,0), f'{soloq_palier_lol} {soloq_division_lol}', font=myFont)
-        draw.text((lolAccountFields["soloqRankField"][0]-r/2, lolAccountFields["soloqRankField"][1]-b/2), f'{soloq_palier_lol} {soloq_division_lol}', font=myFont, fill=('#c5c5c5'))
+        draw.text((self.lolAccountFields["soloqRankField"][0]-r/2, self.lolAccountFields["soloqRankField"][1]-b/2), f'{soloq_palier_lol} {soloq_division_lol}', font=myFont, fill=('#c5c5c5'))
         _, _, r, b = draw.textbbox((0,0), f'{flex_palier_lol} {flex_division_lol}', font=myFont)
-        draw.text((lolAccountFields["flexRankField"][0]-r/2, lolAccountFields["flexRankField"][1]-b/2), f'{flex_palier_lol} {flex_division_lol}', font=myFont, fill=('#c5c5c5'))
+        draw.text((self.lolAccountFields["flexRankField"][0]-r/2, self.lolAccountFields["flexRankField"][1]-b/2), f'{flex_palier_lol} {flex_division_lol}', font=myFont, fill=('#c5c5c5'))
         _, _, r, b = draw.textbbox((0,0), last_aram_date[:-6], font=myFont)
-        draw.text((lolAccountFields["aramLastGameDayField"][0]-r/2, lolAccountFields["aramLastGameDayField"][1]-b/2), last_aram_date[:-6], font=myFont, fill=('#c5c5c5'))
+        draw.text((self.lolAccountFields["aramLastGameDayField"][0]-r/2, self.lolAccountFields["aramLastGameDayField"][1]-b/2), last_aram_date[:-6], font=myFont, fill=('#c5c5c5'))
         
         _, _, r, b = draw.textbbox((0,0), f'{str(soloq_league_point_lol)} lp', font=myFont)
-        draw.text((lolAccountFields["soloqPointsField"][0]-r/2, lolAccountFields["soloqPointsField"][1]-b/2), f'{str(soloq_league_point_lol)} lp', font=myFont, fill=('#c5c5c5'))
+        draw.text((self.lolAccountFields["soloqPointsField"][0]-r/2, self.lolAccountFields["soloqPointsField"][1]-b/2), f'{str(soloq_league_point_lol)} lp', font=myFont, fill=('#c5c5c5'))
         _, _, r, b = draw.textbbox((0,0), f'{str(flex_league_point_lol)} lp', font=myFont)
-        draw.text((lolAccountFields["flexPointsField"][0]-r/2, lolAccountFields["flexPointsField"][1]-b/2), f'{str(flex_league_point_lol)} lp', font=myFont, fill=('#c5c5c5'))
+        draw.text((self.lolAccountFields["flexPointsField"][0]-r/2, self.lolAccountFields["flexPointsField"][1]-b/2), f'{str(flex_league_point_lol)} lp', font=myFont, fill=('#c5c5c5'))
         _, _, r, b = draw.textbbox((0,0), last_aram_date[-5:], font=myFont)
-        draw.text((lolAccountFields["aramLastGameHourField"][0]-r/2, lolAccountFields["aramLastGameHourField"][1]-b/2), last_aram_date[-5:], font=myFont, fill=('#c5c5c5'))
+        draw.text((self.lolAccountFields["aramLastGameHourField"][0]-r/2, self.lolAccountFields["aramLastGameHourField"][1]-b/2), last_aram_date[-5:], font=myFont, fill=('#c5c5c5'))
 
         _, _, r, b = draw.textbbox((0,0), f'{soloq_wins_lol}W/{soloq_losses_lol}L', font=myFont)
-        draw.text((lolAccountFields["soloqRatioField"][0]-r/2, lolAccountFields["soloqRatioField"][1]-b/2), f'{soloq_wins_lol}W/{soloq_losses_lol}L', font=myFont, fill=('#c5c5c5'))
+        draw.text((self.lolAccountFields["soloqRatioField"][0]-r/2, self.lolAccountFields["soloqRatioField"][1]-b/2), f'{soloq_wins_lol}W/{soloq_losses_lol}L', font=myFont, fill=('#c5c5c5'))
         _, _, r, b = draw.textbbox((0,0), f'{flex_wins_lol}W/{flex_losses_lol}L', font=myFont)
-        draw.text((lolAccountFields["flexRatioField"][0]-r/2, lolAccountFields["flexRatioField"][1]-b/2), f'{flex_wins_lol}W/{flex_losses_lol}L', font=myFont, fill=('#c5c5c5'))
+        draw.text((self.lolAccountFields["flexRatioField"][0]-r/2, self.lolAccountFields["flexRatioField"][1]-b/2), f'{flex_wins_lol}W/{flex_losses_lol}L', font=myFont, fill=('#c5c5c5'))
         
         _, _, r, b = draw.textbbox((0,0), f'{soloq_winrate[:5]}%', font=myFont)
-        draw.text((lolAccountFields["soloqWinrateField"][0]-r/2, lolAccountFields["soloqWinrateField"][1]-b/2), f'{soloq_winrate[:5]}%', font=myFont, fill=('#c5c5c5'))
+        draw.text((self.lolAccountFields["soloqWinrateField"][0]-r/2, self.lolAccountFields["soloqWinrateField"][1]-b/2), f'{soloq_winrate[:5]}%', font=myFont, fill=('#c5c5c5'))
         _, _, r, b = draw.textbbox((0,0), f'{flex_winrate[:5]}%', font=myFont)
-        draw.text((lolAccountFields["flexWinrateField"][0]-r/2, lolAccountFields["flexWinrateField"][1]-b/2), f'{flex_winrate[:5]}%', font=myFont, fill=('#c5c5c5'))
+        draw.text((self.lolAccountFields["flexWinrateField"][0]-r/2, self.lolAccountFields["flexWinrateField"][1]-b/2), f'{flex_winrate[:5]}%', font=myFont, fill=('#c5c5c5'))
 
         template.save('assets/LolAccount.png')
 

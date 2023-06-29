@@ -27,28 +27,23 @@ FFMPEG_BEFORE_OPTS = '-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 20
 
 
 async def audio_playing(ctx):
-    """Verifie que le bot est en train de lire une vidéo."""
+    """Check if audio is currently playing."""
     client = ctx.guild.voice_client
-    if client and client.channel and client.source:
-        return True
-    else:
-        return False
+
+    return True if client and client.channel and client.source else False
 
 
 async def in_voice_channel(ctx):
-    """Verifie que le bot soit dans un channel."""
+    """Check if the user is in the same voice channel as the bot."""
     voice = ctx.user.voice
     bot_voice = ctx.guild.voice_client
-    if voice and bot_voice and voice.channel and bot_voice.channel and voice.channel == bot_voice.channel:
-        return True
-    else:
-        return False
+    
+    return True if voice and bot_voice and voice.channel and bot_voice.channel and voice.channel == bot_voice.channel else False
 
 class Video:
-    """Class containing information about a particular video."""
+    """Represents a video from YouTube."""
 
     def __init__(self, url_or_search, requested_by):
-        """Plays audio from (or searches for) a URL."""
         with ytdl.YoutubeDL(YTDL_OPTS) as ydl:
             video = ydl.extract_info(url_or_search, download=False)
             video_format = video["formats"][0]
@@ -59,17 +54,19 @@ class Video:
             self.requested_by = requested_by
 
     def get_embed(self):
-        """Makes an embed out of this Video's information."""
-        embed = discord.Embed(
-            title=self.title, description="", url=self.video_url)
+        """Return an embed with the video information."""
+        embed = discord.Embed(title=self.title,
+                              description="",
+                              url=self.video_url)
         embed.set_footer(
             text=f"Ajouté par {self.requested_by.name}",
             icon_url=self.requested_by.avatar)
-        if self.thumbnail:
-            embed.set_thumbnail(url=self.thumbnail)
-        return embed
+
+        embed.set_thumbnail(url=self.thumbnail) if self.thumbnail else embed
 
 class MusicInteraction(View):
+    """Base class for music interactions."""
+
     def __init__(self,music_player, url):
         super().__init__(timeout=None)
         self.player = music_player
@@ -77,6 +74,7 @@ class MusicInteraction(View):
         self.video_url = url
         self.add_item(Button(label="Voir sur Youtube",url=url,row=1))
         self.errorMessage = "Tu dois être dans le même salon vocal que le bot pour ça"
+
 
     @discord.ui.button(label="Pause", style=discord.ButtonStyle.grey)
     async def pause_button_callback(self,button,interaction):
@@ -156,10 +154,7 @@ class Music(commands.Cog):
         asyncio.run_coroutine_threadsafe(self.bot.change_presence(activity=None),self.bot.loop)
 
     def _pause_audio(self, client):
-        if client.is_paused():
-            client.resume()
-        else:
-            client.pause()
+        client.resume() if client.is_paused() else client.pause()
 
     async def _skip(self, interaction):
         interaction.guild.voice_client.stop()
@@ -200,8 +195,7 @@ class Music(commands.Cog):
             state = self.get_state(interaction.guild)
             state.loop_flag=not state.loop_flag
             return True
-        else:
-            return False
+        else: return False
 
     async def get_loop_status(self,interaction):
         state = self.get_state(interaction.guild)
@@ -220,10 +214,9 @@ class Music(commands.Cog):
             message = ['**Queue :**']
             message +=[f'  [P] **{state.playlist[0][1]}** (Ajoutée par **{str(state.playlist[0][2])[:-5]}**)']
             for i in range (len(state.playlist)-1):
-                message += [f"  [{i+1}] **{state.playlist[i+1][1]}** (Ajoutée par **{str(state.playlist[i+1][2])[:-5]}**)"]  # add individual songs
+                message += [f"  [{i+1}] **{state.playlist[i+1][1]}** (Ajoutée par **{str(state.playlist[i+1][2])[:-5]}**)"]  # add songs individually
             return "\n".join(message)
-        else:
-            return "La file est vide !"
+        else: return "La file est vide !"
 
     @slash_command(guild_ids=[int(os.getenv("SERVEUR_NST")),int(os.getenv("SERVEUR_FC"))])
     @commands.guild_only()
@@ -233,11 +226,12 @@ class Music(commands.Cog):
         client = ctx.guild.voice_client
         state = self.get_state(ctx.guild)  # get the guild's state
 
+        await ctx.defer()
+
         if client and client.channel:
             if ctx.author.voice:
                 if ctx.author.voice.channel.id==client.channel.id:
-                    await ctx.defer()
-                    state.webhook = ctx.followup
+                    
                     try:
                         videoList = []
                         with ytdl.YoutubeDL(YTDL_OPTS) as ydl:
@@ -255,14 +249,14 @@ class Music(commands.Cog):
 
                     for video in videoList :
                         state.playlist.append([video[0], video[1], video[2]])
-                    await ctx.respond("Musique(s) ajoutée(s)")
+
+                    await ctx.followup.send(content="Musique(s) ajoutée(s)")
+
                 else: await ctx.response.send_message("Le bot est déjà dans un autre channel",ephemeral=True)
             else: await ctx.response.send_message("Le bot est déjà dans un autre channel",ephemeral=True)
 
         else:
             if ctx.author.voice is not None and ctx.author.voice.channel is not None:
-                await ctx.defer()
-                state.webhook = ctx.followup
                 channel = ctx.author.voice.channel
                 try:
                     videoList = []
@@ -285,18 +279,28 @@ class Music(commands.Cog):
 
                 for video in videoList :
                     state.playlist.append([video[0],video[1], video[2]])
+
+                await ctx.followup.send(content="Musique(s) ajoutée(s)")
                 
                 if ctx.author.voice is not None and ctx.author.voice.channel is not None:
                     currentSong = Video(state.playlist[0][0], state.playlist[0][2])
-                    state.player_message = await state.webhook.send(embed=currentSong.get_embed(),view = MusicInteraction(self,currentSong.video_url))
+                    bot_name = ctx.guild.me.display_name
+                    state.webhook = await ctx.channel.create_webhook(name=bot_name)
+                    state.webhook_pp = str(ctx.guild.me.display_avatar.url)
+                    state.player_message = await state.webhook.send(embed=currentSong.get_embed(),
+                                                                    view = MusicInteraction(self,currentSong.video_url),
+                                                                    avatar_url=state.webhook_pp,
+                                                                    wait=True)
                     self._play_song(client, state, currentSong)
                     
             else:
                 await ctx.response.send_message("Tu dois être dans un salon vocal pour faire ça.",ephemeral=True)
-                raise commands.CommandError("Tu dois être dans un salon vocal pour faire ça.")
 
     async def send_player(self,video,state):
-        state.player_message = await state.webhook.send(embed=video.get_embed(),view = MusicInteraction(self,video.video_url))
+        state.player_message = await state.webhook.send(embed=video.get_embed(),
+                                                        view = MusicInteraction(self,video.video_url),
+                                                        avatar_url=state.webhook_pp,
+                                                        wait=True)
 
 def setup(bot):
     bot.add_cog(Music(bot))
@@ -310,3 +314,4 @@ class GuildState:
         self.webhook = None
         self.player_message = None
         self.loop_flag = False
+        self.webhook_pp = None

@@ -66,13 +66,13 @@ class unMotParJour(Cog):
         # The following line adds a newline before each definition
         for letter in uppercase_letters: result = result.replace(letter, '\n' + letter)
 
-        # Add a newline after the third consecutive newline
+        # Add a newline after the third newline
         temp = result
         result = ''
         for char in temp:
             if char == '\n':
                 nb_n += 1
-                result += char + '\n' if nb_n == 2 else char
+                result += char + '\n' if nb_n == 1 else char
             else: result += char
 
         return result

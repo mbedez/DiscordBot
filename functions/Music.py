@@ -6,7 +6,7 @@ from discord.ui import Button, View
 
 import asyncio
 import logging
-import youtube_dl as ytdl
+import yt_dlp as ytdl
 
 import os
 
@@ -49,8 +49,7 @@ class Video:
     def __init__(self, url_or_search, requested_by):
         with ytdl.YoutubeDL(YTDL_OPTS) as ydl:
             video = ydl.extract_info(url_or_search, download=False)
-            video_format = video["formats"][0]
-            self.stream_url = video_format["url"]
+            self.stream_url = video["url"]
             self.video_url = video["webpage_url"]
             self.title = video["title"]
             self.thumbnail = video["thumbnail"] if "thumbnail" in video \

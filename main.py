@@ -44,4 +44,4 @@ async def ping(message):
     await message.channel.send(f"{round(bot.latency*1000)} ms")
 
 
-bot.run(os.getenv("TOKEN_TEST"))
+bot.run(os.getenv("TOKEN"))

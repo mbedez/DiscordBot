@@ -15,7 +15,6 @@ RUN apk add --no-cache zlib-dev \
  && apk add --no-cache libffi-dev \
  && apk add --no-cache tzdata \
  && pip install --no-cache-dir -r requirements.txt \
- && pip install git+https://github.com/ytdl-org/youtube-dl.git@master \
  && apk del zlib-dev \
  && apk del jpeg-dev \
  && apk del build-base \

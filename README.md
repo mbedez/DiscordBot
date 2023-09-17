@@ -36,7 +36,7 @@ FafBot runs in python with the help of the **pycord** package. In order to run t
 
 
 You can use the Dockerfile to buid an Alpine Docker image for Raspberry pi 4 with `docker build -t your/tag .`.
-You can also use `pip install -r requirements.txt` to install the necessary libraries. (youtube-dl needs to be installed from github version with pip `install git+https://github.com/ytdl-org/youtube-dl.git@master`)
+You can also use `pip install -r requirements.txt` to install the necessary libraries.
 
 ***
 ## What is the future of FafBot

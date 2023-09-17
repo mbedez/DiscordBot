@@ -28,13 +28,13 @@ class Help(Cog):
 
 
                                "**&poll** : "
-                               "Ajoute des réactions 🟩 et 🟥 \
-                                sur le message précédent\n\n"
+                               "Ajoute des réactions 🟩 et 🟥 "
+                               "sur le message précédent\n\n"
 
 
                                "**&shifumi** : "
-                               "Ajoute des réactions 🪨, 🧾 et ✂️ sur \
-                                un message du bot\n\n"
+                               "Ajoute des réactions 🪨, 🧾 et ✂️ sur "
+                               "un message du bot\n\n"
 
 
                                "**/play (url youtube ou recherche)** : "

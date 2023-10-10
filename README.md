@@ -17,6 +17,7 @@ Here's a list of different things you could do with this bot:
 - **&lolaccount** *summoner_name* => give you the level, all his ranks, the number of aram and the date of his last aram of the summoner.
 - **&lolhisto** *summoner_name* ( Optional : *nb_of_game (<=30)* *queue (soloq or flex)*) => give you the last nb_of_game of the summoner with the result (win or lose, kda) and the played champion.
 - **/play** *youtube url or research* => Play the audio on your current audio channel. (Can also play playlist)
+- **/seek** *Go to indicated timecode on the current song*
 
 - The Bot also send a random definition of a french word every day on a specific channel you set for.
 ***

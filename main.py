@@ -1,6 +1,6 @@
 import os
 
-from functions import Random, Delete, Help, Poll,\
+from functions import Random, Delete, Help, Poll, \
      LolAccount, Shifumi, OneWordEachDay, Music
 
 from abc import ABC

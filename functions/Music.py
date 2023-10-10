@@ -1,7 +1,7 @@
 from discord.ext import commands
 import discord
 from discord import Activity, ActivityType
-from discord.commands import slash_command, message_command
+from discord.commands import slash_command, message_command, command
 from discord.ui import Button, View
 
 import asyncio
@@ -9,6 +9,7 @@ import logging
 import yt_dlp as ytdl
 
 import os
+import random
 
 YTDL_OPTS = {
     "default_search": "ytsearch",
@@ -52,6 +53,7 @@ class Video:
             self.stream_url = video["url"]
             self.video_url = video["webpage_url"]
             self.title = video["title"]
+            self.duration = video["duration"]
             self.thumbnail = video["thumbnail"] if "thumbnail" in video \
                 else None
             self.requested_by = requested_by
@@ -61,9 +63,8 @@ class Video:
         embed = discord.Embed(title=self.title,
                               description="",
                               url=self.video_url)
-        embed.set_footer(
-            text=f"Ajouté par {self.requested_by.name}",
-            icon_url=self.requested_by.avatar)
+        embed.set_footer(text=f"Ajouté par {self.requested_by.name}",
+                         icon_url=self.requested_by.avatar)
 
         embed.set_thumbnail(url=self.thumbnail) if self.thumbnail else embed
         return embed
@@ -77,9 +78,8 @@ class MusicInteraction(View):
         self.player = music_player
         self.playing = True
         self.video_url = url
-        self.add_item(Button(label="Voir sur Youtube", url=url, row=1))
-        self.errorMessage = "Tu dois être dans le même \
-            salon vocal que le bot pour ça"
+        self.errorMessage = "Tu dois être dans le même " + \
+            "salon vocal que le bot pour ça"
 
     @discord.ui.button(label="Pause", style=discord.ButtonStyle.grey)
     async def pause_button_callback(self, button, interaction):
@@ -136,6 +136,26 @@ class MusicInteraction(View):
             await interaction.response.send_message(self.errorMessage,
                                                     ephemeral=True)
 
+    @discord.ui.button(label="Shuffle", style=discord.ButtonStyle.secondary)
+    async def shuffle_button_callback(self, button, interaction):
+        client = interaction.guild.voice_client
+        if interaction.user.voice:
+            if interaction.user.voice.channel.id == client.channel.id:
+                state = self.player.get_state(interaction.guild)
+                if len(state.playlist) > 2:
+                    await self.player._shuffle_playlist(state)
+                    await interaction.response.send_message("Shuffled!",
+                                                            ephemeral=True)
+                else:
+                    await interaction.response.send_message(
+                        "La playlist doit être plus remplie !", ephemeral=True)
+            else:
+                await interaction.response.send_message(
+                    self.errorMessage, ephemeral=True)
+        else:
+            await interaction.response.send_message(
+                self.errorMessage, ephemeral=True)
+
     @discord.ui.button(label="Stop", style=discord.ButtonStyle.danger)
     async def stop_button_callback(self, button, interaction):
         client = interaction.guild.voice_client
@@ -180,7 +200,14 @@ class Music(commands.Cog):
     async def _skip(self, interaction):
         interaction.guild.voice_client.stop()
 
-    def _play_song(self, client, state, song):
+    async def _shuffle_playlist(self, state):
+        playlist_copy = state.playlist[1:]
+        random.shuffle(playlist_copy)
+        playlist_copy.insert(0, state.playlist[0])
+        state.playlist = playlist_copy
+
+    def _play_song(self, ctx, client, state,
+                   song, seek_option=FFMPEG_BEFORE_OPTS):
         state.now_playing = song
         _activity = Activity(name=f"{song.title}",
                              type=getattr(ActivityType, "listening",
@@ -189,13 +216,17 @@ class Music(commands.Cog):
             self.bot.change_presence(activity=_activity), self.bot.loop)
         channel = client.channel
         source = discord.FFmpegOpusAudio(song.stream_url,
-                                         before_options=FFMPEG_BEFORE_OPTS)
+                                         before_options=seek_option)
         print(f"Je lance {song.title}")
 
         def after_playing(err):
-            if state.loop_flag and (len(channel.members) > 1):
+            if state.seek_asked:
+                state.seek_asked = False
+                state.playlist.pop(1)
+
+            elif state.loop_flag and (len(channel.members) > 1):
                 next_song = state.now_playing
-                self._play_song(client, state, next_song)
+                self._play_song(ctx, client, state, next_song)
 
             elif (len(state.playlist) > 1) and (len(channel.members) > 1):
                 state.playlist.pop(0)
@@ -203,7 +234,7 @@ class Music(commands.Cog):
                 if state.player_message is not None:
                     asyncio.run_coroutine_threadsafe(
                         state.player_message.edit(view=None), self.bot.loop)
-                self._play_song(client, state, next_song)
+                self._play_song(ctx, client, state, next_song)
                 asyncio.run_coroutine_threadsafe(
                     self.send_player(next_song, state), self.bot.loop)
 
@@ -213,8 +244,8 @@ class Music(commands.Cog):
                 asyncio.run_coroutine_threadsafe(
                     state.player_message.edit(view=None), self.bot.loop)
                 state.now_playing = None
-                asyncio.run_coroutine_threadsafe(
-                    client.disconnect(), self.bot.loop)
+                asyncio.run_coroutine_threadsafe(client.disconnect(),
+                                                 self.bot.loop)
                 asyncio.run_coroutine_threadsafe(
                     self.bot.change_presence(activity=None), self.bot.loop)
 
@@ -233,8 +264,10 @@ class Music(commands.Cog):
         return state.loop_flag
 
     @message_command(name="Afficher la queue",
-                     guild_ids=[int(os.getenv("SERVEUR_NST")),
-                                int(os.getenv("SERVEUR_FC"))])
+                     guild_ids=[
+                         int(os.getenv("SERVEUR_NST")),
+                         int(os.getenv("SERVEUR_FC"))
+                     ])
     async def queue(self, interaction, message):
         """Send the current queue."""
         state = self.get_state(interaction.guild)
@@ -246,19 +279,25 @@ class Music(commands.Cog):
         queue = state.playlist
         if len(queue) > 0 or state.now_playing is not None:
             message = ['**Queue :**']
-            message += [f'  [P] **{state.playlist[0][1]}** \
-                        (Ajoutée par **{str(state.playlist[0][2])[:-5]}**)']
+            message += [
+                f'  [P] **{state.playlist[0][1]}** \
+                        (Ajoutée par **{str(state.playlist[0][2])[:-5]}**)'
+            ]
             # add songs individually
-            for i in range(len(state.playlist)-1):
-                message += [f"  [{i+1}] **{state.playlist[i+1][1]}** \
+            for i in range(len(state.playlist) - 1):
+                message += [
+                    f"  [{i+1}] **{state.playlist[i+1][1]}** \
                             (Ajoutée par **\
-                            {str(state.playlist[i+1][2])[:-5]}**)"]
+                            {str(state.playlist[i+1][2])[:-5]}**)"
+                ]
             return "\n".join(message)
         else:
             return "La file est vide !"
 
-    @slash_command(guild_ids=[int(os.getenv("SERVEUR_NST")),
-                              int(os.getenv("SERVEUR_FC"))])
+    @slash_command(guild_ids=[
+        int(os.getenv("SERVEUR_NST")),
+        int(os.getenv("SERVEUR_FC"))
+    ])
     @commands.guild_only()
     async def play(self, ctx, *, url):
         """Play a song from youtube from a url or \
@@ -280,13 +319,14 @@ class Music(commands.Cog):
                             if "_type" in video and \
                                video["_type"] == "playlist":
                                 for i in range(len(video["entries"])):
-                                    videoList.append(
-                                        [video["entries"][i]["url"],
-                                         video["entries"][i]["title"],
-                                         ctx.author])
+                                    videoList.append([
+                                        video["entries"][i]["url"],
+                                        video["entries"][i]["title"],
+                                        ctx.author
+                                    ])
                             else:
-                                videoList.append([url, video["title"],
-                                                  ctx.author])
+                                videoList.append(
+                                    [url, video["title"], ctx.author])
 
                     except ytdl.DownloadError as e:
                         logging.warn(f"Error downloading video: {e}")
@@ -307,8 +347,7 @@ class Music(commands.Cog):
                         ephemeral=True)
             else:
                 await ctx.response.send_message(
-                    "Le bot est déjà dans un autre channel",
-                    ephemeral=True)
+                    "Le bot est déjà dans un autre channel", ephemeral=True)
 
         else:
             if ctx.author.voice is not None and \
@@ -320,9 +359,10 @@ class Music(commands.Cog):
                         video = ydl.extract_info(url, download=False)
                         if "_type" in video and video["_type"] == "playlist":
                             for i in range(len(video["entries"])):
-                                videoList.append([video["entries"][i]["url"],
-                                                  video["entries"][i]["title"],
-                                                  ctx.author])
+                                videoList.append([
+                                    video["entries"][i]["url"],
+                                    video["entries"][i]["title"], ctx.author
+                                ])
                         else:
                             videoList.append([url, video["title"], ctx.author])
 
@@ -352,7 +392,7 @@ class Music(commands.Cog):
 
                     await self.send_player(currentSong, state)
 
-                    self._play_song(client, state, currentSong)
+                    self._play_song(ctx, client, state, currentSong)
 
             else:
                 await ctx.response.send_message(
@@ -390,12 +430,64 @@ class Music(commands.Cog):
         state.webhook_pp = str(ctx.guild.me.display_avatar.url)
 
     async def send_player(self, currentSong, state):
+        embed = currentSong.get_embed()
+        embed.add_field(name="Duration",
+                        value=f"{currentSong.duration} seconds",
+                        inline=True)
         state.player_message = \
             await state.webhook.send(
-                embed=currentSong.get_embed(),
+                embed=embed,
                 view=MusicInteraction(self, currentSong.video_url),
                 avatar_url=state.webhook_pp,
                 wait=True)
+
+    @command(name='seek')
+    async def seek(self, ctx, new_pos: int):
+        """Avance dans la musique en cours."""
+        client = ctx.guild.voice_client
+
+        if client and client.channel:
+            if ctx.author.voice:
+                if ctx.author.voice.channel.id == client.channel.id:
+                    if await audio_playing(ctx):
+                        state = self.get_state(ctx.guild)
+                        current_song = state.now_playing
+                        if current_song:
+                            if 0 <= new_pos <= current_song.duration:
+                                # Modifier le délai de départ pour avancer
+                                state.seek_asked = True
+                                options = f"{FFMPEG_BEFORE_OPTS} -ss {new_pos}"
+                                state.playlist.insert(
+                                    1, [
+                                        current_song.video_url,
+                                        current_song.title,
+                                        current_song.requested_by.name])
+                                client.stop()
+                                self._play_song(ctx, client,
+                                                state,
+                                                current_song, options)
+                                await ctx.response.send_message(
+                                    "Seeked !", ephemeral=True)
+                            else:
+                                await ctx.response.send_message(
+                                    "La position demandée est invalide.",
+                                    ephemeral=True)
+                    else:
+                        await ctx.response.send_message(
+                            "Aucune musique en cours de lecture.",
+                            ephemeral=True)
+                else:
+                    await ctx.response.send_message(
+                        "Vous devez être dans le même canal vocal que le bot.",
+                        ephemeral=True)
+            else:
+                await ctx.response.send_message(
+                    "Vous devez être dans un canal vocal pour"
+                    "utiliser cette commande.",
+                    ephemeral=True)
+        else:
+            await ctx.response.send_message(
+                "Le bot n'est pas connecté à un canal vocal.", ephemeral=True)
 
 
 def setup(bot):
@@ -412,3 +504,4 @@ class GuildState:
         self.player_message = None
         self.loop_flag = False
         self.webhook_pp = None
+        self.seek_asked = False

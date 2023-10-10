@@ -443,7 +443,7 @@ class Music(commands.Cog):
 
     @command(name='seek')
     async def seek(self, ctx, new_pos: int):
-        """Avance dans la musique en cours."""
+        """Seek to a specified duration in the current song."""
         client = ctx.guild.voice_client
 
         if client and client.channel:

@@ -286,9 +286,9 @@ class Music(commands.Cog):
             # add songs individually
             for i in range(len(state.playlist) - 1):
                 message += [
-                    f"  [{i+1}] **{state.playlist[i+1][1]}** \
-                            (Ajoutée par **\
-                            {str(state.playlist[i+1][2])[:-5]}**)"
+                    f"  [{i+1}] **{state.playlist[i+1][1]}** " +
+                    "(Ajoutée par ** " + 
+                    f"{str(state.playlist[i+1][2])[:-5]}**)"
                 ]
             return "\n".join(message)
         else:

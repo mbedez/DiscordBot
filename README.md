@@ -33,7 +33,19 @@ FafBot runs in python with the help of the **pycord** package. In order to run t
 - Pillow : A library used to edit an image
 - bs4 : A library used to parse html
 - apscheduler : A library used to schedule a task
-- a *config* file containing your **discord Token** and your **Riot API Key**
+- a *config* file containing your **discord Token** and your **Riot API Key** (Should looks like bellow)
+
+```yaml
+TOKEN="DISCORD_TOKEN"
+
+RIOT_KEY="RIOT_TOKEN"
+
+CHANNEL_MOTS='CHANNEL_ID'
+
+SERVEUR_NST='SERVER_ID'
+SERVEUR_FC='SERVER_ID'
+```
+
 ***
 ## How to setup FafBot?
 You can launch it directly on your computer, use also can use `pip install -r requirements.txt` to install the necessary libraries.

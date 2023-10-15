@@ -34,11 +34,23 @@ FafBot runs in python with the help of the **pycord** package. In order to run t
 - bs4 : A library used to parse html
 - apscheduler : A library used to schedule a task
 - a *config* file containing your **discord Token** and your **Riot API Key**
+***
+## How to setup FafBot?
+You can launch it directly on your computer, use also can use `pip install -r requirements.txt` to install the necessary libraries.
 
+Or ou can use the **Docker image** on `faruquon/discord` on hub.docker.com.
+You can found just bellow a `docker-compose.yml` file.
 
-You can use the Dockerfile to buid an Alpine Docker image for Raspberry pi 4 with `docker build -t your/tag .`.
-You can also use `pip install -r requirements.txt` to install the necessary libraries.
-
+```yaml
+version: '3'
+services:
+  fafbot:
+    container_name: Fafbot
+    image: faruquon/discordbot
+    volumes:
+      - ./config:/app/config
+    restart: unless-stopped
+```
 ***
 ## What is the future of FafBot
 Nothing else than corrections and improvements.

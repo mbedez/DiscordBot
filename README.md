@@ -38,7 +38,7 @@ FafBot runs in python with the help of the **pycord** package. In order to run t
 ## How to setup FafBot?
 You can launch it directly on your computer, use also can use `pip install -r requirements.txt` to install the necessary libraries.
 
-Or ou can use the **Docker image** on `faruquon/discord` on hub.docker.com.
+Or ou can use the **Docker image** on `faruquon/discordbot` on hub.docker.com.
 You can found just bellow a `docker-compose.yml` file.
 
 ```yaml

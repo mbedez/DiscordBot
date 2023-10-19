@@ -3,7 +3,7 @@
 [Intro](#What-is-FafBot) - [Commands](#What-can-you-do-with-it) - [Setup](#What-do-you-need-in-order-to-set-FafBot-up) - [The future of FafBot](#What-is-the-future-of-FafBot)
 ***
 ## What is FafBot?
-FafBot is a small project I made for fun using discord and discord and riot API.
+FafBot is a self-hosted discord bot I made for fun using discord and riot API.
 ***
 ## What can you do with it?
 Here's a list of different things you could do with this bot:

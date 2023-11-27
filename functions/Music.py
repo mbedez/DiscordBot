@@ -266,6 +266,7 @@ class Music(commands.Cog):
     @message_command(name="Afficher la queue",
                      guild_ids=[
                          int(os.getenv("SERVEUR_NST")),
+                         int(os.getenv("SERVEUR_BST")),
                          int(os.getenv("SERVEUR_FC"))
                      ])
     async def queue(self, interaction, message):
@@ -296,6 +297,7 @@ class Music(commands.Cog):
 
     @slash_command(guild_ids=[
         int(os.getenv("SERVEUR_NST")),
+        int(os.getenv("SERVEUR_BST")),
         int(os.getenv("SERVEUR_FC"))
     ])
     @commands.guild_only()

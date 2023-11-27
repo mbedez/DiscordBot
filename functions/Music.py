@@ -2,7 +2,7 @@ from discord.ext import commands
 import discord
 from discord import Activity, ActivityType
 from discord.commands import slash_command, message_command, command
-from discord.ui import Button, View
+from discord.ui import View
 
 import asyncio
 import logging
@@ -287,7 +287,7 @@ class Music(commands.Cog):
             for i in range(len(state.playlist) - 1):
                 message += [
                     f"  [{i+1}] **{state.playlist[i+1][1]}** " +
-                    "(Ajoutée par ** " + 
+                    "(Ajoutée par ** " +
                     f"{str(state.playlist[i+1][2])[:-5]}**)"
                 ]
             return "\n".join(message)

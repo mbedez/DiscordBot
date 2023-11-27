@@ -1,7 +1,7 @@
 import os
 
 from functions import Random, Delete, Help, Poll, \
-     LolAccount, Shifumi, OneWordEachDay, Music
+     LolAccount, Shifumi, OneWordEachDay, Music, Vxtwitter
 
 from abc import ABC
 
@@ -11,7 +11,10 @@ from dotenv import load_dotenv
 
 load_dotenv(dotenv_path="config")
 
-COGS = [Random, Delete, Help, Poll, LolAccount, Shifumi, OneWordEachDay, Music]
+COGS = [
+    Random, Delete, Help, Poll, LolAccount, Shifumi,
+    OneWordEachDay, Music, Vxtwitter
+]
 
 
 class DocBot(Bot, ABC):

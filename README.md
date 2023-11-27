@@ -3,7 +3,7 @@
 [Intro](#What-is-FafBot) - [Commands](#What-can-you-do-with-it) - [Setup](#What-do-you-need-in-order-to-set-FafBot-up) - [The future of FafBot](#What-is-the-future-of-FafBot)
 ***
 ## What is FafBot?
-FafBot is a small project I made for fun using discord and discord and riot API.
+FafBot is a self-hosted discord bot I made for fun using discord and riot API.
 ***
 ## What can you do with it?
 Here's a list of different things you could do with this bot:
@@ -33,12 +33,36 @@ FafBot runs in python with the help of the **pycord** package. In order to run t
 - Pillow : A library used to edit an image
 - bs4 : A library used to parse html
 - apscheduler : A library used to schedule a task
-- a *config* file containing your **discord Token** and your **Riot API Key**
+- a *config* file containing your **discord Token** and your **Riot API Key** (Should looks like bellow)
 
+```yaml
+TOKEN="DISCORD_TOKEN"
 
-You can use the Dockerfile to buid an Alpine Docker image for Raspberry pi 4 with `docker build -t your/tag .`.
-You can also use `pip install -r requirements.txt` to install the necessary libraries.
+RIOT_KEY="RIOT_TOKEN"
 
+CHANNEL_MOTS='CHANNEL_ID'
+
+SERVEUR_NST='SERVER_ID'
+SERVEUR_FC='SERVER_ID'
+```
+
+***
+## How to setup FafBot?
+You can launch it directly on your computer, use also can use `pip install -r requirements.txt` to install the necessary libraries.
+
+Or ou can use the **Docker image** on `faruquon/discordbot` on hub.docker.com.
+You can found just bellow a `docker-compose.yml` file.
+
+```yaml
+version: '3'
+services:
+  fafbot:
+    container_name: Fafbot
+    image: faruquon/discordbot
+    volumes:
+      - ./config:/app/config
+    restart: unless-stopped
+```
 ***
 ## What is the future of FafBot
 Nothing else than corrections and improvements.

@@ -39,7 +39,11 @@ class Help(Cog):
 
                                "**/play (url youtube ou recherche)** : "
                                "Joue une musique sur le salon vocal "
-                               "actuel\n\n")
+                               "actuel\n\n"
+                              
+                              "**/seek (timecode en s)** : "
+                              "Se déplace au timecode donné "
+                              "dans la musique en cours\n\n")
 
 
 def setup(bot):

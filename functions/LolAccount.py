@@ -1,17 +1,19 @@
 import discord
 from discord.ext.commands import Cog
-from discord.ext.commands import command
+from discord.ext import commands
+from discord.commands import slash_command
 
 import os
-import requests
 from dotenv import load_dotenv
+import requests
 import datetime
 
 from PIL import Image, ImageDraw, ImageFont
 
-
 load_dotenv(dotenv_path="config")
+
 RIOT_KEY = (os.getenv("RIOT_KEY"))
+AUTHORIZED_GUILDS = eval(str(os.getenv("AUTHORIZED_GUILDS"))).values()
 
 
 class LolAccount(Cog):
@@ -33,11 +35,9 @@ class LolAccount(Cog):
                                  'aramLastGameDayField': (2392, 1729),
                                  'aramLastGameHourField': (2392, 1810)}
 
-    @command(name='lolaccount')
-    async def lol_account(self, ctx, summoner_name):
-
-        print(f"lolaccount command used by {ctx.author.name} "
-              f"in {ctx.guild.name}")
+    @slash_command(guild_ids=AUTHORIZED_GUILDS)
+    @commands.guild_only()
+    async def lolaccount(self, ctx, summoner_name):
 
         # Open an image and editing it
         template = Image.open('assets/template.png')
@@ -249,10 +249,11 @@ class LolAccount(Cog):
 
         template.save('assets/LolAccount.png')
 
-        # Send it
-        await ctx.channel.send(file=discord.File('assets/LolAccount.png'))
+        await ctx.response.send_message(
+            file=discord.File('assets/LolAccount.png'))
 
-    @command(name='lolhisto')
+    @slash_command(guild_ids=AUTHORIZED_GUILDS)
+    @commands.guild_only()
     async def lolhisto(self, ctx, summoner_name, nb_game=5, type_queue="all"):
         if not 0 < nb_game < 30:
             nb_game = 30
@@ -262,14 +263,15 @@ class LolAccount(Cog):
         puuid_lol = str(responsejson["puuid"])
         histo_lol = await self.histo_taker(puuid_lol, type_queue)
 
-        posted_message = await ctx.channel.send("```Recherche en cours...```")
+        posted_message = await ctx.response.send_message(
+            "```Recherche en cours...```")
 
         message = "```"
 
         if nb_game > len(histo_lol):
             nb_game = len(histo_lol)
         for i in range(nb_game):
-            await posted_message.edit(
+            await posted_message.edit_original_response(
                 content=f"```Récupération de la game {i+1}```")
             match_lol = await self.match_info_taker(histo_lol[nb_game-i-1])
             j = 0
@@ -291,7 +293,8 @@ class LolAccount(Cog):
                 message = f"{message}🟥 {kda} {championName}\n"
         message = f"{message}```"
 
-        await posted_message.edit(content="```Analyse des games...```")
+        await posted_message.edit_original_response(
+            content="```Analyse des games...```")
 
         max_lose_streak = 0
         max_win_streak = 0
@@ -310,7 +313,8 @@ class LolAccount(Cog):
                     max_lose_streak = lose_streak
                 win_streak = 0
 
-        await posted_message.edit(content=message)
+        await posted_message.edit_original_response(content=message)
+        posted_message = await posted_message.original_response()
 
         if 6 <= max_win_streak:
             await posted_message.add_reaction("🥵")

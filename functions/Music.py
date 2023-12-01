@@ -9,7 +9,11 @@ import logging
 import yt_dlp as ytdl
 
 import os
-import random
+from dotenv import load_dotenv
+
+load_dotenv(dotenv_path="config")
+
+AUTHORIZED_GUILDS = eval(str(os.getenv("AUTHORIZED_GUILDS"))).values()
 
 YTDL_OPTS = {
     "default_search": "ytsearch",
@@ -263,13 +267,8 @@ class Music(commands.Cog):
         state = self.get_state(interaction.guild)
         return state.loop_flag
 
-    @message_command(name="Afficher la queue",
-                     guild_ids=[
-                         int(os.getenv("SERVEUR_NST")),
-                         int(os.getenv("SERVEUR_BST")),
-                         int(os.getenv("SERVEUR_FC"))
-                     ])
-    async def queue(self, interaction, message):
+    @message_command(name="Afficher la queue", guild_ids=AUTHORIZED_GUILDS)
+    async def queue(self, interaction):
         """Send the current queue."""
         state = self.get_state(interaction.guild)
         await interaction.response.send_message(self._queue_text(state)[:2000],
@@ -295,11 +294,7 @@ class Music(commands.Cog):
         else:
             return "La file est vide !"
 
-    @slash_command(guild_ids=[
-        int(os.getenv("SERVEUR_NST")),
-        int(os.getenv("SERVEUR_BST")),
-        int(os.getenv("SERVEUR_FC"))
-    ])
+    @slash_command(guild_ids=AUTHORIZED_GUILDS)
     @commands.guild_only()
     async def play(self, ctx, *, url):
         """Play a song from youtube from a url or \

@@ -1,38 +1,53 @@
 from discord.ext.commands import Cog
+from discord.ext import commands
+from discord.commands import slash_command
+
 from random import randint
-from discord.ext.commands import command
+
+import os
+from dotenv import load_dotenv
+
+load_dotenv(dotenv_path="config")
+
+AUTHORIZED_GUILDS = eval(str(os.getenv("AUTHORIZED_GUILDS"))).values()
 
 
 class Random(Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @command(name='random')
+    @slash_command(guild_ids=AUTHORIZED_GUILDS)
+    @commands.guild_only()
     async def random(self, ctx, value: int):
         result = randint(1, value)
-        await ctx.channel.send(f"{result}")
+        await ctx.response.send_message(f"{result}")
 
-    # dice is like random but only between 1 and 6 and respond only with emoji
-    @command(name='dice')
+    @slash_command(guild_ids=AUTHORIZED_GUILDS)
+    @commands.guild_only()
     async def dice(self, ctx, value=6):
+        """dice is like random but only between 1 and 6
+        and respond only with emoji"""
+        value = int(value)
         result = randint(1, value)
         if 7 > value > 0:
             if result == 1:
-                await ctx.channel.send("1️⃣")
+                await ctx.response.send_message("1️⃣")
             elif result == 2:
-                await ctx.channel.send("2️⃣")
+                await ctx.response.send_message("2️⃣")
             elif result == 3:
-                await ctx.channel.send("3️⃣")
+                await ctx.response.send_message("3️⃣")
             elif result == 4:
-                await ctx.channel.send("4️⃣")
+                await ctx.response.send_message("4️⃣")
             elif result == 5:
-                await ctx.channel.send("5️⃣")
+                await ctx.response.send_message("5️⃣")
             elif result == 6:
-                await ctx.channel.send("6️⃣")
+                await ctx.response.send_message("6️⃣")
         elif value >= 7:
-            await ctx.channel.send("Le dé doit comporter six faces ou moins.")
+            await ctx.response.send_message(
+                "Le dé doit comporter six faces ou moins.")
         elif value <= 0:
-            await ctx.channel.send("Le dé doit comporter au moins une face.")
+            await ctx.response.send_message(
+                "Le dé doit comporter au moins une face.")
 
 
 def setup(bot):

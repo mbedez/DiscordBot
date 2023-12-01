@@ -3,16 +3,18 @@ from discord.ext.commands import Cog
 from discord.commands import slash_command
 
 import os
+from dotenv import load_dotenv
+
+load_dotenv(dotenv_path="config")
+
+AUTHORIZED_GUILDS = eval(str(os.getenv("AUTHORIZED_GUILDS"))).values()
 
 
 class Vxtwitter(Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @slash_command(guild_ids=[
-        int(os.getenv("SERVEUR_NST")),
-        int(os.getenv("SERVEUR_FC"))
-    ])
+    @slash_command(guild_ids=AUTHORIZED_GUILDS)
     @commands.guild_only()
     async def vxtwitter(self, ctx, *, url):
         """Send the url with vxtwitter integration."""

@@ -18,10 +18,9 @@ class Sondage(Cog):
     @commands.guild_only()
     async def poll(self, ctx: commands.Context):
 
-        messages = await ctx.channel.history(limit=2).flatten()
-        await messages[0].delete()
-        await messages[1].add_reaction("🟩")
-        await messages[1].add_reaction("🟥")
+        messages = await ctx.channel.history(limit=1).flatten()
+        await messages[0].add_reaction("🟩")
+        await messages[0].add_reaction("🟥")
 
         await ctx.response.send_message(
                                     "Polled !", ephemeral=True)

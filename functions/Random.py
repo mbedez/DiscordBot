@@ -19,14 +19,16 @@ class Random(Cog):
     @slash_command(guild_ids=AUTHORIZED_GUILDS)
     @commands.guild_only()
     async def random(self, ctx, value: int):
+        """Send random number between 1 and value."""
+
         result = randint(1, value)
         await ctx.response.send_message(f"{result}")
 
     @slash_command(guild_ids=AUTHORIZED_GUILDS)
     @commands.guild_only()
     async def dice(self, ctx, value=6):
-        """dice is like random but only between 1 and 6
-        and respond only with emoji"""
+        """dice is like random but only between 1 and 6 with emoji"""
+
         value = int(value)
         result = randint(1, value)
         if 7 > value > 0:

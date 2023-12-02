@@ -17,6 +17,7 @@ class Sondage(Cog):
     @slash_command(guild_ids=AUTHORIZED_GUILDS)
     @commands.guild_only()
     async def poll(self, ctx: commands.Context):
+        """Add reactions 🟩 and 🟥 on the previous message."""
 
         messages = await ctx.channel.history(limit=1).flatten()
         await messages[0].add_reaction("🟩")

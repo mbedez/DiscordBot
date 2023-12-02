@@ -38,6 +38,7 @@ class LolAccount(Cog):
     @slash_command(guild_ids=AUTHORIZED_GUILDS)
     @commands.guild_only()
     async def lolaccount(self, ctx, summoner_name):
+        """Send recap of LoL account."""
 
         # Open an image and editing it
         template = Image.open('assets/template.png')
@@ -255,6 +256,8 @@ class LolAccount(Cog):
     @slash_command(guild_ids=AUTHORIZED_GUILDS)
     @commands.guild_only()
     async def lolhisto(self, ctx, summoner_name, nb_game=5, type_queue="all"):
+        """Send the histo of the summoner."""
+
         if not 0 < nb_game < 30:
             nb_game = 30
         summoner_name = str(summoner_name)

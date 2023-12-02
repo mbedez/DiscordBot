@@ -17,6 +17,7 @@ class Shifumi(Cog):
     @slash_command(guild_ids=AUTHORIZED_GUILDS)
     @commands.guild_only()
     async def shifumi(self, ctx):
+        """Send Shifumi message with reactions 🪨, 🧾 and ✂️."""
 
         messages = await ctx.channel.history(limit=1).flatten()
         await messages[0].delete()

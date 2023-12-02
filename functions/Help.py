@@ -17,6 +17,7 @@ class Help(Cog):
     @slash_command(guild_ids=AUTHORIZED_GUILDS)
     @commands.guild_only()
     async def help(self, ctx):
+        """Send all commands."""
         await ctx.response.send_message(
             "**/random n** : génère un nombre entre 1 et **n**\n"
 

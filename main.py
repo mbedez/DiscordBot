@@ -1,4 +1,5 @@
 import os
+from dotenv import load_dotenv
 
 from functions import Random, Delete, Help, Poll, \
      LolAccount, Shifumi, OneWordEachDay, Music, Vxtwitter
@@ -6,11 +7,14 @@ from functions import Random, Delete, Help, Poll, \
 from abc import ABC
 
 from discord.ext.commands import Bot, MissingRequiredArgument, TooManyArguments
+from discord.ext import commands
+from discord.commands import slash_command
 from discord import Intents
-from dotenv import load_dotenv
+
 
 load_dotenv(dotenv_path="config")
 
+AUTHORIZED_GUILDS = eval(str(os.getenv("AUTHORIZED_GUILDS"))).values()
 COGS = [
     Random, Delete, Help, Poll, LolAccount, Shifumi,
     OneWordEachDay, Music, Vxtwitter
@@ -42,8 +46,10 @@ class DocBot(Bot, ABC):
 bot = DocBot()
 
 
-@bot.command(name='ping')
+@slash_command(guild_ids=AUTHORIZED_GUILDS)
+@commands.guild_only()
 async def ping(message):
+    """Send ping of the bot (should be between 95 and 110 ms)"""
     await message.channel.send(f"{round(bot.latency*1000)} ms")
 
 

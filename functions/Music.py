@@ -8,6 +8,7 @@ import asyncio
 import logging
 import yt_dlp as ytdl
 
+import random
 import os
 from dotenv import load_dotenv
 
@@ -268,7 +269,7 @@ class Music(commands.Cog):
         return state.loop_flag
 
     @message_command(name="Afficher la queue", guild_ids=AUTHORIZED_GUILDS)
-    async def queue(self, interaction):
+    async def queue(self, interaction, message):
         """Send the current queue."""
         state = self.get_state(interaction.guild)
         await interaction.response.send_message(self._queue_text(state)[:2000],
